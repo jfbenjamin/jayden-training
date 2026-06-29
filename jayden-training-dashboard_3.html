@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jayden's training base</title>
+<style>
+  :root {
+    --surface-0: #f4f3ef;
+    --surface-1: #fbfaf7;
+    --surface-2: #ffffff;
+    --text-primary: #1a1a18;
+    --text-secondary: #5f5e5a;
+    --text-muted: #888780;
+    --border: #e3e1d8;
+    --border-strong: #d3d1c7;
+    --radius: 10px;
+    --bg-danger: #fcebeb;
+    --text-danger: #791f1f;
+    --bg-warning: #faeeda;
+    --text-warning: #633806;
+    --text-accent: #185fa5;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-0);
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+  #app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 4rem;
+  }
+  h1 { font-size: 22px; font-weight: 500; margin: 0 0 2px; }
+  h2 { font-size: 18px; font-weight: 500; margin: 0 0 0.75rem; }
+  h3 { font-size: 14px; font-weight: 500; margin: 0 0 4px; color: var(--text-primary); }
+  .top-row { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; }
+  .streak-num { font-size:24px; font-weight:500; text-align:right; }
+  .streak-label { font-size:12px; color:var(--text-muted); text-align:right; }
+  .sync-note { font-size:12px; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:6px; }
+  .sync-note.warn { color: var(--text-warning); }
+  .grid4 { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:1.5rem; }
+  @media (max-width: 560px) { .grid4 { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+  .stat-card { background:var(--surface-1); border:0.5px solid var(--border); border-radius:var(--radius); padding:1rem; }
+  .stat-label { font-size:13px; color:var(--text-secondary); margin-bottom:2px; }
+  .stat-value { font-size:24px; font-weight:500; }
+  .stat-value .unit { font-size:14px; color:var(--text-muted); }
+  .banner { display:none; background:var(--bg-danger); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:1.25rem; font-size:14px; color:var(--text-danger); }
+  section { margin-bottom: 1.75rem; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+  label { font-size:13px; color:var(--text-secondary); display:block; margin-bottom:4px; }
+  input[type=range] { width:100%; }
+  input[type=number], input[type=text], select, textarea {
+    width:100%; height:36px; border:0.5px solid var(--border-strong); border-radius:var(--radius);
+    background:var(--surface-2); padding:0 10px; font-size:14px; color:var(--text-primary); font-family:inherit;
+  }
+  textarea { height:auto; padding:8px 10px; }
+  button {
+    height:40px; border:0.5px solid var(--border-strong); border-radius:var(--radius);
+    background:var(--surface-2); cursor:pointer; font-size:14px; font-weight:500; color:var(--text-primary);
+    font-family:inherit;
+  }
+  button:hover { background:var(--surface-1); }
+  button:active { transform: scale(0.98); }
+  .full-btn { width:100%; }
+  .slider-val { text-align:center; font-size:13px; margin-top:2px; color:var(--text-secondary); }
+  .mission-card { background:var(--surface-1); border:0.5px solid var(--border); border-radius:var(--radius); padding:0.875rem 1rem; margin-bottom:8px; }
+  .mission-card.done { opacity:0.55; }
+  .mission-top { display:flex; align-items:flex-start; gap:12px; }
+  .mission-check { width:18px; height:18px; flex-shrink:0; margin-top:2px; }
+  .mission-name { font-size:14px; font-weight:500; }
+  .mission-name.strike { text-decoration:line-through; }
+  .mission-meta { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .mission-link { font-size:12px; color:var(--text-accent); text-decoration:none; margin-left:8px; white-space:nowrap; }
+  .mission-detail { font-size:13px; color:var(--text-secondary); margin:6px 0 0 30px; }
+  .mission-detail ul { margin:4px 0; padding-left:18px; }
+  .mission-detail li { margin-bottom:2px; }
+  .header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; }
+  .progress-note { font-size:13px; color:var(--text-muted); }
+  .reset-link { font-size:12px; color:var(--text-muted); text-align:center; margin-top:2rem; cursor:pointer; text-decoration:underline; }
+  .config-banner { background:var(--bg-warning); color:var(--text-warning); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:1.25rem; font-size:13px; }
+  .day-nav { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:0.75rem; }
+  .day-nav button { width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .day-nav-center { display:flex; align-items:center; gap:8px; flex:1; justify-content:center; }
+  .day-nav-center input[type=date] { width:auto; max-width:170px; height:36px; }
+  #day-today-btn { width:auto; padding:0 14px; height:36px; }
+  .readonly-banner { background:var(--surface-1); border:0.5px solid var(--border); border-radius:var(--radius); padding:0.6rem 1rem; margin-bottom:1.25rem; font-size:13px; color:var(--text-secondary); display:flex; align-items:center; gap:8px; }
+  .balance-card { background:var(--surface-1); border:0.5px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1rem; text-align:center; }
+  .balance-label { font-size:13px; color:var(--text-secondary); }
+  .balance-value { font-size:32px; font-weight:500; margin:2px 0; }
+  .balance-sub { font-size:12px; color:var(--text-muted); }
+  .reward-card { background:var(--surface-1); border:0.5px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .reward-card.affordable { border-color: var(--border-strong); }
+  .reward-info { flex:1; min-width:0; }
+  .reward-name { font-size:14px; font-weight:500; }
+  .reward-xp { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .reward-redeem-btn { width:auto; padding:0 16px; flex-shrink:0; }
+  .reward-redeem-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .edit-tier-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .edit-tier-row input[type=text] { flex:2; }
+  .edit-tier-row input[type=number] { flex:1; }
+  .edit-tier-row button { width:36px; padding:0; flex-shrink:0; }
+  .history-row { display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:0.5px solid var(--border); }
+  .history-row:last-child { border-bottom:none; }
+  .history-name { color:var(--text-primary); }
+  .history-meta { color:var(--text-muted); font-size:12px; }
+  .history-xp { color:var(--text-danger); white-space:nowrap; }
+  .history-empty { font-size:13px; color:var(--text-muted); padding:0.5rem 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-row">
+    <div>
+      <h1>Jayden's training base</h1>
+      <p style="margin:0; font-size:13px; color:var(--text-secondary);" id="date-label">Loading...</p>
+    </div>
+    <div>
+      <div class="streak-num" id="streak-num">0</div>
+      <div class="streak-label">day streak</div>
+    </div>
+  </div>
+
+  <div class="day-nav">
+    <button id="day-prev" aria-label="Previous day">&larr;</button>
+    <div class="day-nav-center">
+      <input type="date" id="day-picker" max="">
+      <button id="day-today-btn">Today</button>
+    </div>
+    <button id="day-next" aria-label="Next day">&rarr;</button>
+  </div>
+  <div class="readonly-banner" id="readonly-banner" style="display:none;"></div>
+
+  <div id="config-banner" class="config-banner" style="display:none;">
+    Sync isn't set up yet — this device is saving locally only. See the "Apps Script Setup" doc in Drive, then paste the Web App URL into SCRIPT_URL near the top of this file.
+  </div>
+  <div class="sync-note" id="sync-status">
+    <span>Checking sync status...</span>
+  </div>
+
+  <div class="grid4">
+    <div class="stat-card">
+      <div class="stat-label">XP this day</div>
+      <div class="stat-value" id="xp-today">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total XP (all-time)</div>
+      <div class="stat-value" id="xp-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Load</div>
+      <div class="stat-value" id="load-today">0<span class="unit">/100</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pain (1-10)</div>
+      <div class="stat-value" id="pain-today">-</div>
+    </div>
+  </div>
+
+  <div class="banner" id="pain-banner"></div>
+
+  <section id="checkin-section">
+    <h2>Morning check-in</h2>
+    <div class="form-grid">
+      <div>
+        <label>Pain (1-10)</label>
+        <input type="range" min="0" max="10" step="1" value="0" id="pain-slider">
+        <div class="slider-val" id="pain-val">0</div>
+      </div>
+      <div>
+        <label>Energy (1-5)</label>
+        <input type="range" min="1" max="5" step="1" value="4" id="energy-slider">
+        <div class="slider-val" id="energy-val">4</div>
+      </div>
+      <div>
+        <label>Sleep (hrs)</label>
+        <input type="number" min="0" max="14" step="0.5" value="9" id="sleep-input">
+      </div>
+      <div>
+        <label>Water (cups)</label>
+        <input type="number" min="0" max="20" step="1" value="4" id="water-input">
+      </div>
+    </div>
+    <button class="full-btn" id="checkin-btn">Save check-in</button>
+  </section>
+
+  <section id="missions-section">
+    <div class="header-row">
+      <h2 style="margin:0;">Missions — <span id="day-name"></span></h2>
+      <span class="progress-note" id="mission-progress"></span>
+    </div>
+    <div id="mission-list"></div>
+  </section>
+
+  <section id="weekly-section">
+    <h2>This week</h2>
+    <div class="grid4">
+      <div class="stat-card">
+        <div class="stat-label">Touches</div>
+        <div class="stat-value" style="font-size:20px;" id="wk-touches">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Juggling PB</div>
+        <div class="stat-value" style="font-size:20px;" id="wk-juggle">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg pain</div>
+        <div class="stat-value" style="font-size:20px;" id="wk-pain">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Days completed</div>
+        <div class="stat-value" style="font-size:20px;" id="wk-completed">0/7</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rewards-section">
+    <div class="header-row">
+      <h2 style="margin:0;">Rewards</h2>
+      <span class="progress-note" id="rewards-edit-toggle" style="cursor:pointer; text-decoration:underline;">Edit shop</span>
+    </div>
+    <div class="balance-card">
+      <div class="balance-label">XP balance</div>
+      <div class="balance-value" id="xp-balance">0</div>
+      <div class="balance-sub" id="xp-earned-spent"></div>
+    </div>
+    <div id="rewards-list"></div>
+    <div id="rewards-edit-panel" style="display:none; margin-top:0.75rem;">
+      <div id="rewards-edit-rows"></div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button id="rewards-add-tier" style="flex:1;">Add reward</button>
+        <button id="rewards-save" style="flex:1;">Save shop</button>
+      </div>
+    </div>
+    <div class="header-row" style="margin-top:1.25rem;">
+      <h3 style="margin:0; font-size:14px; color:var(--text-secondary);">Redemption history</h3>
+      <span class="progress-note" id="history-toggle" style="cursor:pointer; text-decoration:underline;">Show</span>
+    </div>
+    <div id="history-list" style="display:none;"></div>
+  </section>
+
+  <section id="after-section" style="display:none;">
+    <h2>End of day log</h2>
+    <div class="form-grid">
+      <div>
+        <label>Touches today</label>
+        <input type="number" min="0" step="10" value="0" id="touches-input">
+      </div>
+      <div>
+        <label>Juggling best (reps)</label>
+        <input type="number" min="0" step="1" value="0" id="juggle-input">
+      </div>
+      <div>
+        <label>Minutes trained</label>
+        <input type="number" min="0" step="5" value="0" id="minutes-input">
+      </div>
+      <div>
+        <label>Evening stretch done</label>
+        <select id="stretch-select">
+          <option value="no">Not yet</option>
+          <option value="yes">Done</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label>Notes</label>
+      <textarea id="notes-input" rows="2" placeholder="How did training feel today?"></textarea>
+    </div>
+    <button class="full-btn" id="save-day-btn">Save day's log</button>
+  </section>
+
+  <div class="reset-link" id="reset-link">Reset all data on this device</div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
+<script>
+(function() {
+  // ====== CONFIG ======
+  // Paste your deployed Apps Script Web App URL here once you've finished setup.
+  // Leave blank to run in local-only mode (data stays on this device).
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzoKVr9SL3nVS6JZN2nQcrv_qotRP9-ZeLpMj4FShmELO9ZGKVB3Ljm03oGyeh1AQ/exec';
+  // =====================
+
+  const WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const JONER_BASE = 'https://app.jonerfootball.com';
+  const JF = {
+    ballMastery: JONER_BASE + '/catalog/search?catalog_filter_14750%5B%5D=75259',
+    speedAgility: JONER_BASE + '/catalog/search?catalog_filter_14750%5B%5D=75165',
+    passingFirstTouch: JONER_BASE + '/catalog/search?catalog_filter_14750%5B%5D=75166',
+    dribbling: JONER_BASE + '/catalog/search?catalog_filter_14750%5B%5D=75167',
+    dribbling7day: JONER_BASE + '/programs/dribblingprogram?category_id=224579',
+    passing6week: JONER_BASE + '/programs/6weekpassing?category_id=224579',
+    weakFoot: JONER_BASE + '/programs/weak-foot?category_id=224579'
+  };
+
+  // ====== PROGRAM CONFIG ======
+  // 90-day progressive summer program. Difficulty scales by week phase:
+  // weeks 1-2 base, 3-5 build, 6-8 peak, 9-10 taper, 11+ maintain.
+  // Set PROGRAM_START to the actual first day of the program.
+  const PROGRAM_START = '2026-06-29';
+  // ============================
+
+  function weekNumberFor(key) {
+    const diffDays = dayjs(key).diff(dayjs(PROGRAM_START), 'day');
+    return Math.max(1, Math.floor(diffDays / 7) + 1);
+  }
+
+  function phaseFor(week) {
+    if (week <= 2) return { name: 'base', mult: 1.0, repsLabel: 'base' };
+    if (week <= 5) return { name: 'build', mult: 1.15, repsLabel: '+15%' };
+    if (week <= 8) return { name: 'peak', mult: 1.3, repsLabel: '+30%' };
+    if (week <= 10) return { name: 'taper', mult: 0.85, repsLabel: 'taper' };
+    return { name: 'maintain', mult: 0.75, repsLabel: 'maintain' };
+  }
+
+  function scaleReps(base, mult) {
+    return Math.round(base * mult / 5) * 5; // round to nearest 5
+  }
+
+  const MOBILITY = {
+    name: 'Morning mobility + Osgood-Schlatter routine',
+    time: '8:30 AM',
+    xp: 10,
+    load: 5,
+    type: 'mobility',
+    link: null,
+    detail: ['Quad stretch', 'Hip flexor stretch', 'Hamstring stretch', 'Calf stretch',
+      'Glute bridges x15', 'Clamshells x15', 'Single-leg balance (30 sec each)']
+  };
+  const RECOVERY_SLOT = {
+    name: 'Recovery + Osgood-Schlatter mobility',
+    time: '8:00 PM',
+    xp: 10,
+    load: 0,
+    type: 'mobility',
+    link: null,
+    detail: ['Stretch', 'Foam roll', 'Ice if sore', '8–10 minutes']
+  };
+
+  // Weekday technical focus rotation (used for the 10:00 AM slot's theme)
+  const WEEKDAY_FOCUS = {
+    Sunday:    { label: 'Recovery day', joner: null },
+    Monday:    { label: 'Ball mastery', joner: JF.ballMastery },
+    Tuesday:   { label: 'Change of direction', joner: JF.dribbling },
+    Wednesday: { label: 'Scanning & awareness', joner: JF.passingFirstTouch },
+    Thursday:  { label: 'Speed & agility', joner: JF.speedAgility },
+    Friday:    { label: 'First touch & passing', joner: JF.passingFirstTouch },
+    Saturday:  { label: 'Challenge day', joner: JF.weakFoot },
+  };
+
+  // The 7-Day Dribbling Program, split into 3 chunks/day across a 7-day cycle.
+  // Each day completes one full Joner session in three ~10-12 min sittings.
+  const DRIBBLING_7DAY_SPLIT = [
+    "Part 1 of 3 — first 10–12 minutes of today's Joner dribbling session",
+    "Part 2 of 3 — next 10–12 minutes, same session, picking up where you left off",
+    "Part 3 of 3 — final 10–12 minutes, complete the session",
+  ];
+
+  function buildDay(key) {
+    const dn = dayNameFor(key);
+    const week = weekNumberFor(key);
+    const phase = phaseFor(week);
+    const focus = WEEKDAY_FOCUS[dn];
+    const cycleDay = ((dayjs(key).diff(dayjs(PROGRAM_START), 'day') % 7) + 7) % 7; // 0-6, which day of the 7-day dribbling cycle
+
+    if (dn === 'Sunday') {
+      return [
+        MOBILITY,
+        {name:'Recovery', time:'10:00 AM', xp:15, load:5, type:'recovery', link:null,
+          detail:['Easy walk', 'Stretch', 'Foam roll', scaleReps(80,phase.mult)+' light juggles', 'No hard cutting']},
+        RECOVERY_SLOT,
+      ];
+    }
+
+    const touches = scaleReps(80, phase.mult);
+    const vpulls = scaleReps(40, phase.mult);
+    const passReps = scaleReps(40, phase.mult);
+    const juggleGoal = scaleReps(200, phase.mult);
+    const burstReps = scaleReps(8, phase.mult);
+
+    return [
+      MOBILITY,
+      {name:`10:00 AM — Technical: ${focus.label} (part 1/3)`, time:'10:00 AM', xp:15, load:Math.round(15*phase.mult), type:'technical', link:focus.joner,
+        detail:[DRIBBLING_7DAY_SPLIT[0], `Week ${week} · ${phase.name} phase (${phase.repsLabel})`]},
+      {name:'11:30 AM — Ball mastery', time:'11:30 AM', xp:15, load:Math.round(15*phase.mult), type:'technical', link:JF.ballMastery,
+        detail:[`${touches} foundation touches`, `${touches} inside/outside touches`, `${vpulls} V-pulls`]},
+      {name:'2:30 PM — Agility / scanning (part 2/3)', time:'2:30 PM', xp:15, load:Math.round(20*phase.mult), type:'technical', link:JF.speedAgility,
+        detail:[DRIBBLING_7DAY_SPLIT[1], `${burstReps} x 5-yard bursts / reaction starts`]},
+      {name:'4:00 PM — Rebounder work', time:'4:00 PM', xp:15, load:Math.round(15*phase.mult), type:'technical', link:null,
+        detail:[`${passReps} right-foot passes`, `${passReps} left-foot passes`, `${passReps} one-touch passes`, `${passReps} receive across body`]},
+      {name:'6:00 PM — Fun challenge / juggling (part 3/3)', time:'6:00 PM', xp:15, load:Math.round(10*phase.mult), type:'fun', link:focus.joner,
+        detail:[DRIBBLING_7DAY_SPLIT[2], `Goal: ${juggleGoal} total touches`, "Beat last session's personal best for +15 XP"]},
+      RECOVERY_SLOT,
+    ];
+  }
+
+  const STORAGE_KEY = 'jayden_training_v2';
+  const SHOP_KEY = 'jayden_training_shop_v1';
+  let shopItems = [
+    { name: 'Choose dinner', xp: 500 },
+    { name: 'Dessert', xp: 1000 },
+    { name: 'New soccer accessory', xp: 2500 },
+    { name: 'Pick a family activity', xp: 5000 },
+    { name: 'Big reward', xp: 10000 },
+  ];
+  let redemptions = []; // [{name, xp, date, redeemedBy}]
+
+  function loadShop() {
+    try {
+      const raw = localStorage.getItem(SHOP_KEY);
+      if (raw) shopItems = JSON.parse(raw);
+    } catch(e) { console.error('shop load failed', e); }
+  }
+
+  function saveShop() {
+    try { localStorage.setItem(SHOP_KEY, JSON.stringify(shopItems)); }
+    catch(e) { console.error('shop save failed', e); }
+  }
+
+  const REDEMPTIONS_KEY = 'jayden_training_redemptions_v1';
+  function loadRedemptionsLocal() {
+    try {
+      const raw = localStorage.getItem(REDEMPTIONS_KEY);
+      if (raw) redemptions = JSON.parse(raw);
+    } catch(e) { console.error('redemptions load failed', e); }
+  }
+  function saveRedemptionsLocal() {
+    try { localStorage.setItem(REDEMPTIONS_KEY, JSON.stringify(redemptions)); }
+    catch(e) { console.error('redemptions save failed', e); }
+  }
+
+  let state = { totalXP: 0, streak: 0, lastCompletedDate: null, days: {} };
+  let usingRemote = !!SCRIPT_URL;
+
+  const todayKey = dayjs().format('YYYY-MM-DD');
+  let viewedKey = todayKey;
+
+  function dayNameFor(key) {
+    return WEEKDAYS[dayjs(key).day()];
+  }
+
+  function defaultDay(key) {
+    return {
+      missions: buildDay(key).map(m => ({...m, done:false})),
+      pain: null, energy: null, sleep: null, water: null,
+      touches:0, juggle:0, minutes:0, stretchDone:false, notes:'',
+      checkedIn:false
+    };
+  }
+
+  function mergeTemplate(day, key) {
+    const template = buildDay(key);
+    day.missions = template.map((t, i) => {
+      const existing = day.missions && day.missions[i];
+      return {...t, done: existing ? !!existing.done : false};
+    });
+    return day;
+  }
+
+  function ensureDay(key) {
+    if (!state.days[key]) {
+      state.days[key] = defaultDay(key);
+    } else {
+      mergeTemplate(state.days[key], key);
+      if (state.days[key].checkedIn === undefined) {
+        state.days[key].checkedIn = (state.days[key].pain !== null && state.days[key].pain !== undefined);
+      }
+    }
+    return state.days[key];
+  }
+
+  async function fetchRemote() {
+    const res = await fetch(SCRIPT_URL, { method: 'GET' });
+    if (!res.ok) throw new Error('fetch failed: ' + res.status);
+    return res.json();
+  }
+
+  async function postRemote(payload) {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('post failed: ' + res.status);
+    return res.json();
+  }
+
+  function loadLocal() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        state.totalXP = parsed.totalXP || 0;
+        state.streak = parsed.streak || 0;
+        state.lastCompletedDate = parsed.lastCompletedDate || null;
+        state.days = parsed.days || {};
+      }
+    } catch(e) { console.error('local load failed', e); }
+  }
+
+  function saveLocal() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch(e) { console.error('local save failed', e); }
+  }
+
+  async function loadState() {
+    document.getElementById('day-picker').max = todayKey;
+    const statusEl = document.getElementById('sync-status');
+    const configBanner = document.getElementById('config-banner');
+
+    if (!SCRIPT_URL) {
+      configBanner.style.display = 'block';
+      statusEl.innerHTML = '<span>Local-only mode — data stays on this device.</span>';
+      statusEl.classList.add('warn');
+      loadLocal();
+      loadRedemptionsLocal();
+    } else {
+      try {
+        const remote = await fetchRemote();
+        state.totalXP = remote.summary.totalXP || 0;
+        state.streak = remote.summary.streak || 0;
+        state.lastCompletedDate = remote.summary.lastCompletedDate || null;
+        state.days = {};
+        Object.keys(remote.days).forEach(k => {
+          const r = remote.days[k];
+          state.days[k] = {
+            missions: r.missions && r.missions.length ? r.missions : [],
+            pain: r.pain, energy: r.energy, sleep: r.sleep, water: r.water,
+            touches: r.touches, juggle: r.juggle, minutes: r.minutes,
+            stretchDone: r.stretchDone, notes: r.notes, checkedIn: r.checkedIn
+          };
+        });
+        redemptions = remote.redemptions || [];
+        saveRedemptionsLocal();
+        statusEl.innerHTML = '<i class="ti ti-cloud-check" aria-hidden="true"></i><span>Synced — shared across all devices</span>';
+        usingRemote = true;
+      } catch(e) {
+        console.error('remote load failed, falling back to local', e);
+        statusEl.innerHTML = '<span>Sync unavailable right now — using last saved local data on this device.</span>';
+        statusEl.classList.add('warn');
+        loadLocal();
+        loadRedemptionsLocal();
+        usingRemote = false;
+      }
+    }
+
+    ensureDay(todayKey);
+
+    render();
+  }
+
+  async function persistDay() {
+    saveLocal();
+    if (usingRemote) {
+      try {
+        const d = state.days[viewedKey];
+        await postRemote({
+          action: 'saveDay',
+          day: {
+            date: viewedKey, dayName: dayNameFor(viewedKey), checkedIn: d.checkedIn,
+            pain: d.pain, energy: d.energy, sleep: d.sleep, water: d.water,
+            touches: d.touches, juggle: d.juggle, minutes: d.minutes,
+            stretchDone: d.stretchDone, notes: d.notes, missions: d.missions
+          }
+        });
+      } catch(e) { console.error('remote save day failed', e); }
+    }
+  }
+
+  async function persistSummary() {
+    saveLocal();
+    if (usingRemote) {
+      try {
+        await postRemote({
+          action: 'saveSummary',
+          summary: { totalXP: state.totalXP, streak: state.streak, lastCompletedDate: state.lastCompletedDate }
+        });
+      } catch(e) { console.error('remote save summary failed', e); }
+    }
+  }
+
+  function viewedLoad() {
+    const d = state.days[viewedKey];
+    return d.missions.filter(m=>m.done).reduce((a,m)=>a+m.load,0);
+  }
+
+  function viewedXP() {
+    const d = state.days[viewedKey];
+    let xp = d.missions.filter(m=>m.done).reduce((a,m)=>a+m.xp,0);
+    if (d.missions.every(m=>m.done)) xp += 30;
+    return xp;
+  }
+
+  function checkStreak() {
+    const d = state.days[todayKey];
+    const allDone = d.missions.every(m=>m.done);
+    if (allDone && state.lastCompletedDate !== todayKey) {
+      const yest = dayjs().subtract(1,'day').format('YYYY-MM-DD');
+      if (state.lastCompletedDate === yest) {
+        state.streak += 1;
+      } else {
+        state.streak = 1;
+      }
+      state.lastCompletedDate = todayKey;
+    }
+  }
+
+  function render() {
+    const isToday = viewedKey === todayKey;
+    const isFuture = dayjs(viewedKey).isAfter(dayjs(todayKey));
+    const d = state.days[viewedKey] || ensureDay(viewedKey);
+
+    document.getElementById('date-label').textContent = dayjs(viewedKey).format('dddd, MMMM D, YYYY') + (isToday ? ' · today' : '');
+    document.getElementById('day-name').textContent = dayNameFor(viewedKey);
+    document.getElementById('day-picker').value = viewedKey;
+    document.getElementById('day-next').disabled = isToday;
+    document.getElementById('day-today-btn').disabled = isToday;
+    document.getElementById('streak-num').textContent = state.streak;
+    document.getElementById('xp-today').textContent = viewedXP();
+    const load = viewedLoad();
+    document.getElementById('load-today').innerHTML = load + '<span class="unit">/100</span>';
+    document.getElementById('pain-today').textContent = (d.pain !== null && d.pain !== undefined) ? d.pain : '-';
+
+    const readonlyBanner = document.getElementById('readonly-banner');
+    if (isFuture) {
+      readonlyBanner.style.display = 'flex';
+      readonlyBanner.textContent = "This day hasn't happened yet — showing the planned missions. Check-in and logging open up when it's actually that day.";
+    } else if (!isToday) {
+      readonlyBanner.style.display = 'flex';
+      readonlyBanner.textContent = d.checkedIn || d.missions.some(m=>m.done)
+        ? 'Viewing a past day — read only. Switch to today to log training.'
+        : 'No data was logged for this day.';
+    } else {
+      readonlyBanner.style.display = 'none';
+    }
+
+    const editable = isToday;
+
+    const banner = document.getElementById('pain-banner');
+    if (d.pain !== null && d.pain !== undefined && d.pain > 3) {
+      banner.style.display = 'block';
+      banner.textContent = 'Pain reported above 3/10 — high-impact missions below are swapped for mobility-only work. Skip anything that aggravates the knees.';
+    } else if (load >= 80) {
+      banner.style.display = 'block';
+      banner.textContent = "Today's load is approaching the cap. Consider stopping after this mission and moving straight to recovery.";
+    } else {
+      banner.style.display = 'none';
+    }
+
+    document.getElementById('checkin-section').style.display = (editable && !d.checkedIn) ? 'block' : 'none';
+
+    const highImpactPain = d.pain !== null && d.pain !== undefined && d.pain > 3;
+    const list = document.getElementById('mission-list');
+    list.innerHTML = '';
+    d.missions.forEach((m, i) => {
+      const swapped = highImpactPain && (m.type === 'technical' || m.type === 'fun' || m.type === 'kicking') && m.load > 10;
+      const card = document.createElement('div');
+      card.className = 'mission-card' + (m.done ? ' done' : '');
+      const linkHtml = (m.link && !swapped) ? `<a href="${m.link}" class="mission-link" target="_blank" rel="noopener">Watch drill ↗</a>` : '';
+      let detailHtml = '';
+      if (!swapped && m.detail && m.detail.length) {
+        detailHtml = '<div class="mission-detail"><ul>' + m.detail.map(x => `<li>${x}</li>`).join('') + '</ul></div>';
+      } else if (swapped) {
+        detailHtml = `<div class="mission-detail">${MOBILITY.detail.join(', ')}</div>`;
+      }
+      card.innerHTML = `
+        <div class="mission-top">
+          <input type="checkbox" ${m.done?'checked':''} ${editable?'':'disabled'} data-idx="${i}" class="mission-check">
+          <div style="flex:1;">
+            <div class="mission-name${m.done?' strike':''}">${swapped ? 'Mobility swap (pain > 3)' : m.name}${linkHtml}</div>
+            <div class="mission-meta">${m.time} · ${m.xp} XP</div>
+          </div>
+        </div>
+        ${detailHtml}
+      `;
+      list.appendChild(card);
+    });
+    document.getElementById('mission-progress').textContent =
+      d.missions.filter(m=>m.done).length + '/' + d.missions.length + ' done';
+
+    if (editable) {
+      document.querySelectorAll('.mission-check').forEach(cb => {
+        cb.addEventListener('change', async (e) => {
+          const idx = parseInt(e.target.dataset.idx);
+          d.missions[idx].done = e.target.checked;
+          checkStreak();
+          await persistDay();
+          await persistSummary();
+          render();
+        });
+      });
+    }
+
+    document.getElementById('after-section').style.display = (editable && d.checkedIn) ? 'block' : 'none';
+    if (editable && d.checkedIn) {
+      document.getElementById('touches-input').value = d.touches || 0;
+      document.getElementById('juggle-input').value = d.juggle || 0;
+      document.getElementById('minutes-input').value = d.minutes || 0;
+      document.getElementById('stretch-select').value = d.stretchDone ? 'yes' : 'no';
+      document.getElementById('notes-input').value = d.notes || '';
+    }
+
+    const weekKeys = Object.keys(state.days).filter(k => dayjs(k).isAfter(dayjs(viewedKey).subtract(7,'day')) && !dayjs(k).isAfter(dayjs(viewedKey)));
+    let touches=0, juggleMax=0, painSum=0, painCount=0, completedDays=0;
+    weekKeys.forEach(k => {
+      const wd = state.days[k];
+      touches += wd.touches || 0;
+      if ((wd.juggle||0) > juggleMax) juggleMax = wd.juggle;
+      if (wd.pain !== null && wd.pain !== undefined) { painSum += wd.pain; painCount++; }
+      if (wd.missions && wd.missions.length && wd.missions.every(m=>m.done)) completedDays++;
+    });
+    document.getElementById('wk-touches').textContent = touches.toLocaleString();
+    document.getElementById('wk-juggle').textContent = juggleMax;
+    document.getElementById('wk-pain').textContent = painCount ? (painSum/painCount).toFixed(1) : '-';
+    document.getElementById('wk-completed').textContent = completedDays + '/7';
+
+    let earnedXP = 0;
+    Object.keys(state.days).forEach(k => {
+      if (!dayjs(k).isAfter(dayjs(viewedKey))) earnedXP += dayXP(state.days[k]);
+    });
+    const spentXP = redemptions.reduce((a,r) => a + (r.xp||0), 0);
+    const balance = earnedXP - spentXP;
+
+    document.getElementById('xp-total').textContent = earnedXP.toLocaleString();
+    renderRewards(balance, earnedXP, spentXP);
+    renderHistory();
+  }
+
+  function dayXP(wd) {
+    if (!wd.missions || !wd.missions.length) return 0;
+    let xp = wd.missions.filter(m=>m.done).reduce((a,m)=>a+m.xp,0);
+    if (wd.missions.every(m=>m.done)) xp += 30;
+    return xp;
+  }
+
+  function renderRewards(balance, earnedXP, spentXP) {
+    document.getElementById('xp-balance').textContent = balance.toLocaleString();
+    document.getElementById('xp-earned-spent').textContent =
+      earnedXP.toLocaleString() + ' earned · ' + spentXP.toLocaleString() + ' spent';
+
+    const list = document.getElementById('rewards-list');
+    list.innerHTML = '';
+    const sorted = [...shopItems].sort((a,b) => a.xp - b.xp);
+    sorted.forEach((item, i) => {
+      const affordable = balance >= item.xp;
+      const card = document.createElement('div');
+      card.className = 'reward-card' + (affordable ? ' affordable' : '');
+      card.innerHTML = `
+        <div class="reward-info">
+          <div class="reward-name">${item.name}</div>
+          <div class="reward-xp">${item.xp.toLocaleString()} XP</div>
+        </div>
+        <button class="reward-redeem-btn" data-name="${item.name.replace(/"/g,'&quot;')}" data-xp="${item.xp}" ${affordable?'':'disabled'}>Redeem</button>
+      `;
+      list.appendChild(card);
+    });
+    document.querySelectorAll('.reward-redeem-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const name = e.target.dataset.name;
+        const xp = parseInt(e.target.dataset.xp);
+        await redeemReward(name, xp);
+      });
+    });
+  }
+
+  async function redeemReward(name, xp) {
+    const who = prompt('Who is redeeming "' + name + '" for ' + xp.toLocaleString() + ' XP? (e.g. Jayden or Joe)');
+    if (who === null) return; // cancelled
+    const entry = {
+      name, xp,
+      date: dayjs().format('YYYY-MM-DD HH:mm'),
+      redeemedBy: who.trim() || 'Unknown'
+    };
+    redemptions.unshift(entry);
+    saveRedemptionsLocal();
+    if (usingRemote) {
+      try {
+        await postRemote({ action: 'addRedemption', redemption: entry });
+      } catch(e) { console.error('remote redemption save failed', e); }
+    }
+    render();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '';
+    if (!redemptions.length) {
+      list.innerHTML = '<div class="history-empty">No redemptions yet.</div>';
+      return;
+    }
+    redemptions.slice(0, 30).forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'history-row';
+      row.innerHTML = `
+        <div>
+          <div class="history-name">${r.name}</div>
+          <div class="history-meta">${dayjs(r.date).format('MMM D, h:mm A')} · redeemed by ${r.redeemedBy}</div>
+        </div>
+        <div class="history-xp">-${r.xp.toLocaleString()} XP</div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function renderTierEditRows() {
+    const rows = document.getElementById('rewards-edit-rows');
+    rows.innerHTML = '';
+    shopItems.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.className = 'edit-tier-row';
+      row.innerHTML = `
+        <input type="text" value="${item.name.replace(/"/g,'&quot;')}" data-idx="${i}" data-field="name" class="tier-input">
+        <input type="number" min="0" step="50" value="${item.xp}" data-idx="${i}" data-field="xp" class="tier-input">
+        <button data-idx="${i}" class="tier-remove" aria-label="Remove reward">&times;</button>
+      `;
+      rows.appendChild(row);
+    });
+    document.querySelectorAll('.tier-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.idx);
+        shopItems.splice(idx, 1);
+        renderTierEditRows();
+      });
+    });
+  }
+
+  document.getElementById('pain-slider').addEventListener('input', e => {
+    document.getElementById('pain-val').textContent = e.target.value;
+  });
+  document.getElementById('energy-slider').addEventListener('input', e => {
+    document.getElementById('energy-val').textContent = e.target.value;
+  });
+
+  document.getElementById('checkin-btn').addEventListener('click', async () => {
+    const d = state.days[viewedKey];
+    d.pain = parseInt(document.getElementById('pain-slider').value);
+    d.energy = parseInt(document.getElementById('energy-slider').value);
+    d.sleep = parseFloat(document.getElementById('sleep-input').value);
+    d.water = parseInt(document.getElementById('water-input').value);
+    d.checkedIn = true;
+    await persistDay();
+    render();
+  });
+
+  document.getElementById('save-day-btn').addEventListener('click', async () => {
+    const d = state.days[viewedKey];
+    d.touches = parseInt(document.getElementById('touches-input').value) || 0;
+    d.juggle = parseInt(document.getElementById('juggle-input').value) || 0;
+    d.minutes = parseInt(document.getElementById('minutes-input').value) || 0;
+    d.stretchDone = document.getElementById('stretch-select').value === 'yes';
+    d.notes = document.getElementById('notes-input').value;
+    await persistDay();
+    await persistSummary();
+    render();
+  });
+
+  async function goToDay(key) {
+    if (dayjs(key).isAfter(dayjs(todayKey))) return; // no navigating past today
+    viewedKey = key;
+    if (!state.days[viewedKey]) {
+      if (usingRemote) {
+        // try a fresh fetch in case this date was logged on another device since last load
+        try {
+          const remote = await fetchRemote();
+          Object.keys(remote.days).forEach(k => {
+            const r = remote.days[k];
+            if (!state.days[k]) {
+              state.days[k] = {
+                missions: r.missions && r.missions.length ? r.missions : [],
+                pain: r.pain, energy: r.energy, sleep: r.sleep, water: r.water,
+                touches: r.touches, juggle: r.juggle, minutes: r.minutes,
+                stretchDone: r.stretchDone, notes: r.notes, checkedIn: r.checkedIn
+              };
+            }
+          });
+        } catch(e) { console.error('refresh on day nav failed', e); }
+      }
+    }
+    ensureDay(viewedKey);
+    render();
+  }
+
+  document.getElementById('day-prev').addEventListener('click', () => {
+    goToDay(dayjs(viewedKey).subtract(1, 'day').format('YYYY-MM-DD'));
+  });
+  document.getElementById('day-next').addEventListener('click', () => {
+    goToDay(dayjs(viewedKey).add(1, 'day').format('YYYY-MM-DD'));
+  });
+  document.getElementById('day-today-btn').addEventListener('click', () => {
+    goToDay(todayKey);
+  });
+  document.getElementById('day-picker').addEventListener('change', (e) => {
+    if (e.target.value) goToDay(e.target.value);
+  });
+
+  document.getElementById('reset-link').addEventListener('click', () => {
+    if (confirm('Clear all saved training data on this device? This does not delete data already synced to Google Sheets.')) {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  });
+
+  document.getElementById('rewards-edit-toggle').addEventListener('click', () => {
+    const panel = document.getElementById('rewards-edit-panel');
+    const isOpen = panel.style.display !== 'none';
+    if (isOpen) {
+      panel.style.display = 'none';
+    } else {
+      renderTierEditRows();
+      panel.style.display = 'block';
+    }
+  });
+
+  document.getElementById('rewards-add-tier').addEventListener('click', () => {
+    shopItems.push({ name: 'New reward', xp: 500 });
+    renderTierEditRows();
+  });
+
+  document.getElementById('rewards-save').addEventListener('click', () => {
+    const inputs = document.querySelectorAll('.tier-input');
+    const updated = {};
+    inputs.forEach(inp => {
+      const idx = inp.dataset.idx;
+      if (!updated[idx]) updated[idx] = {};
+      updated[idx][inp.dataset.field] = inp.dataset.field === 'xp' ? (parseInt(inp.value) || 0) : inp.value;
+    });
+    shopItems = Object.keys(updated).map(idx => ({
+      name: updated[idx].name || 'Reward',
+      xp: updated[idx].xp || 0
+    })).filter(t => t.xp > 0);
+    saveShop();
+    document.getElementById('rewards-edit-panel').style.display = 'none';
+    render();
+  });
+
+  document.getElementById('history-toggle').addEventListener('click', (e) => {
+    const list = document.getElementById('history-list');
+    const isOpen = list.style.display !== 'none';
+    list.style.display = isOpen ? 'none' : 'block';
+    e.target.textContent = isOpen ? 'Show' : 'Hide';
+  });
+
+  loadShop();
+  loadState();
+})();
+</script>
+</body>
+</html>
