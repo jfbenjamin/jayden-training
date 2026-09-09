@@ -156,6 +156,23 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
   font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);margin-top:-2px}
 .stats+.stats{margin-top:-4px}
 
+/* grouped grade history */
+.grp{margin-bottom:6px}
+.grp-head{
+  display:flex;align-items:baseline;gap:8px;padding:12px 0 6px;
+  border-bottom:1px solid var(--line);margin-bottom:2px;
+}
+.grp-head .gname{
+  flex:1;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--chalk);
+}
+.grp-head .gavg{
+  font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--accent);
+}
+.grp-head .gcount{font-size:11px;color:var(--chalk-dim);letter-spacing:.06em}
+.grp .tape{border-left:2px solid var(--line);margin-left:6px}
+
 /* ---------- Stats strip ---------- */
 .stats{display:flex;gap:10px;margin-bottom:14px}
 .stat{
@@ -313,7 +330,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
   <div class="card">
     <div class="rule"></div>
     <h3>Grade history</h3>
-    <div class="tape" id="gTape"></div>
+    <div class="seg" id="gView">
+      <button data-v="class" aria-pressed="true">By class</button>
+      <button data-v="recent" aria-pressed="false">Most recent</button>
+    </div>
+    <div id="gTape"></div>
   </div>
 </section>
 
@@ -649,6 +670,7 @@ $('gSave').addEventListener('click',function(){
   $('gScore').value='';
   toast(xp?'+'+xp+' XP':'Logged — no XP under 80');
 });
+seg('gView',function(){ renderGradeHistory(); });
 $('rcSave').addEventListener('click',function(){
   var l=$('rcLetter').value, xp=letterXP(l);
   var sel=$('rcPeriod');
@@ -902,6 +924,40 @@ function tapeRow(e){
     '<span class="tape-xp'+(xp?'':' zero')+'">'+(xp?'+'+xp:'0')+'</span>'+
     '<button class="del" data-del="'+e.id+'" aria-label="Remove entry">×</button></div>';
 }
+function renderGradeHistory(){
+  var all = S.entries.filter(function(e){return e.kind==='grade'||e.kind==='report'});
+  var el = $('gTape');
+  if(!all.length){ el.innerHTML='<div class="empty">No grades logged yet. Add the first one above.</div>'; return; }
+
+  if(segVal('gView')==='recent'){
+    el.innerHTML = '<div class="tape">'+all.map(tapeRow).join('')+'</div>';
+    return;
+  }
+
+  // group by class, ordered by most recent activity
+  var groups={}, order=[];
+  all.forEach(function(e){
+    var k=e.subject||'Other';
+    if(!groups[k]){ groups[k]=[]; order.push(k); }
+    groups[k].push(e);
+  });
+
+  el.innerHTML = order.map(function(k){
+    var rows=groups[k];
+    var scored=rows.filter(function(e){return e.kind==='grade'}).map(function(e){return e.score});
+    var avg = scored.length ? Math.round(scored.reduce(function(a,b){return a+b},0)/scored.length) : null;
+    var n=rows.length;
+    return '<div class="grp">'+
+      '<div class="grp-head">'+
+        '<span class="gname">'+k+'</span>'+
+        '<span class="gcount">'+n+(n===1?' entry':' entries')+'</span>'+
+        '<span class="gavg">'+(avg===null?'—':avg)+'</span>'+
+      '</div>'+
+      '<div class="tape">'+rows.map(tapeRow).join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
 function paint(el,list,emptyMsg){
   el.innerHTML = list.length ? list.map(tapeRow).join('') : '<div class="empty">'+emptyMsg+'</div>';
 }
@@ -930,7 +986,7 @@ function render(){
   $('gAvg').textContent = scored.length ? Math.round(scored.reduce(function(a,b){return a+b},0)/scored.length) : '—';
   $('gAB').textContent = gs.filter(function(e){return e.score>=80}).length + S.entries.filter(function(e){return e.kind==='report'&&(e.letter==='A'||e.letter==='B')}).length;
   $('gCount').textContent = gs.length;
-  paint($('gTape'), S.entries.filter(function(e){return e.kind==='grade'||e.kind==='report'}), 'No grades logged yet. Add the first one above.');
+  renderGradeHistory();
 
   var fgs=S.entries.filter(function(e){return e.kind==='kick'&&e.kickType==='fg'});
   var made=fgs.filter(function(e){return e.made});
