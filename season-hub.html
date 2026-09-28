@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Season Hub">
+<meta name="theme-color" content="#0E0B0B">
+<title>Jayden · Season Hub</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E0B0B;
+  --ink-2:#191314;
+  --ink-3:#2A2122;
+  --chalk:#F4F4F2;
+  --chalk-dim:#9A9A98;
+  --line:#37292B;
+
+  /* Tomball Cougars — grades + kicking */
+  --cougar:#C8102E;
+  --cougar-ink:#FFFFFF;
+  --grades:var(--cougar);
+  --football:var(--cougar);
+
+  /* HTX Soccer */
+  --htx:#C8A951;
+  --htx-ink:#0E0B0B;
+  --soccer:var(--htx);
+
+  --alert:#E4574C;
+
+  --accent:var(--cougar);
+  --accent-ink:var(--cougar-ink);
+
+  --pad:16px;
+  --r:12px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);
+  color:var(--chalk);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:15px;
+  line-height:1.45;
+  padding-bottom:96px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.num,.tab,.btn,.eyebrow{font-family:'Barlow Condensed','Inter',sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:0 var(--pad)}
+
+/* ---------- Header / scoreboard ---------- */
+header{
+  padding:calc(env(safe-area-inset-top) + 18px) 0 0;
+  background:linear-gradient(180deg,var(--ink-2) 0%,var(--ink) 100%);
+  border-top:3px solid var(--accent);
+  border-bottom:1px solid var(--line);
+}
+.eyebrow{
+  font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--chalk-dim);font-weight:600;
+}
+.board{display:flex;align-items:flex-end;gap:14px;margin:6px 0 14px}
+.xp-total{
+  font-size:64px;font-weight:700;line-height:.85;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.xp-meta{padding-bottom:8px;font-size:13px;color:var(--chalk-dim)}
+.xp-meta b{color:var(--chalk);font-weight:600}
+.sync{display:block;margin-top:4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+.sync.ok{color:var(--htx)}
+.sync.err{color:var(--alert)}
+
+.ladder{margin-bottom:16px}
+.ladder-bar{
+  height:10px;border-radius:99px;background:var(--ink-3);
+  overflow:hidden;position:relative;
+}
+.ladder-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.ladder-label{display:flex;justify-content:space-between;font-size:12px;color:var(--chalk-dim);margin-top:7px}
+
+/* ---------- Tabs ---------- */
+nav{display:flex;gap:4px;padding-bottom:0}
+.tab{
+  flex:1;padding:11px 4px 13px;text-align:center;cursor:pointer;
+  font-size:15px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--chalk-dim);background:none;border:none;
+  border-bottom:3px solid transparent;transition:color .15s,border-color .15s;
+}
+.tab[aria-selected="true"]{color:var(--chalk);border-bottom-color:var(--tabc)}
+.tab:focus-visible{outline:2px solid var(--chalk);outline-offset:-2px}
+
+/* ---------- Cards / forms ---------- */
+section{display:none;padding-top:20px}
+section.on{display:block}
+.card{
+  background:var(--ink-2);border:1px solid var(--line);
+  border-radius:var(--r);padding:16px;margin-bottom:14px;
+}
+.card h3{
+  margin:0 0 12px;font-size:17px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.rule{height:2px;background:var(--accent);width:34px;border-radius:2px;margin:0 0 12px}
+label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);margin:0 0 5px;font-weight:600}
+input,select,textarea{
+  width:100%;padding:11px 12px;font-size:16px;font-family:inherit;
+  background:var(--ink);color:var(--chalk);
+  border:1px solid var(--line);border-radius:9px;
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.row{display:flex;gap:10px;margin-bottom:12px}
+.row>div{flex:1;min-width:0}
+.btn{
+  width:100%;padding:13px;border:none;border-radius:9px;cursor:pointer;
+  font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--accent);color:var(--accent-ink);
+}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--chalk);outline-offset:2px}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--chalk-dim);font-size:14px;padding:10px}
+.btn.wide-pair{display:flex;gap:10px}
+
+/* segmented control */
+.seg{display:flex;gap:6px;margin-bottom:12px}
+.seg button{
+  flex:1;padding:11px 4px;border:1px solid var(--line);background:var(--ink);
+  color:var(--chalk-dim);border-radius:9px;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg.rate button{font-size:18px;padding:12px 0}
+
+/* counter stepper */
+.step{display:flex;align-items:center;gap:0;margin-bottom:12px;
+  border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--ink)}
+.step button{
+  width:56px;flex-shrink:0;padding:13px 0;border:none;cursor:pointer;
+  background:var(--ink-3);color:var(--chalk);
+  font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;line-height:1;
+}
+.step button:active{background:var(--accent);color:var(--accent-ink)}
+.step .val{
+  flex:1;text-align:center;font-family:'Barlow Condensed',sans-serif;
+  font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.step .val small{display:block;font-family:'Inter',sans-serif;font-size:11px;
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);margin-top:-2px}
+.stats+.stats{margin-top:-4px}
+
+/* grouped grade history */
+.grp{margin-bottom:6px}
+.grp-head{
+  display:flex;align-items:baseline;gap:8px;padding:12px 0 6px;
+  border-bottom:1px solid var(--line);margin-bottom:2px;
+}
+.grp-head .gname{
+  flex:1;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--chalk);
+}
+.grp-head .gavg{
+  font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--accent);
+}
+.grp-head .gcount{font-size:11px;color:var(--chalk-dim);letter-spacing:.06em}
+.grp .tape{border-left:2px solid var(--line);margin-left:6px}
+
+/* ---------- Stats strip ---------- */
+.stats{display:flex;gap:10px;margin-bottom:14px}
+.stat{
+  flex:1;background:var(--ink-2);border:1px solid var(--line);
+  border-radius:var(--r);padding:12px;text-align:center;
+}
+.stat .num{font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stat .cap{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);margin-top:5px}
+
+/* ---------- Season tape (signature) ---------- */
+.tape{border-left:2px solid var(--line);margin-left:6px;padding-left:0}
+.tape-row{
+  display:flex;align-items:baseline;gap:10px;padding:10px 0 10px 14px;
+  border-bottom:1px dashed var(--line);position:relative;font-size:14px;
+}
+.tape-row:last-child{border-bottom:none}
+.tape-row.hollow::before{background:var(--ink)}
+.tape-row::before{
+  content:"";position:absolute;left:-5px;top:17px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--dot);border:2px solid var(--dot);box-sizing:border-box;
+}
+.tape-when{font-size:11px;color:var(--chalk-dim);letter-spacing:.06em;min-width:44px;flex-shrink:0}
+.tape-what{flex:1;min-width:0}
+.tape-what b{font-weight:600}
+.tape-sub{display:block;font-size:12px;color:var(--chalk-dim)}
+.tape-xp{
+  font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+}
+.tape-xp.zero{color:var(--chalk-dim)}
+.tape-xp.spend{color:var(--alert)}
+.del{background:none;border:none;color:var(--chalk-dim);font-size:18px;cursor:pointer;padding:0 2px;line-height:1}
+
+/* ---------- Rewards ---------- */
+.reward{
+  display:flex;align-items:center;gap:12px;padding:13px 0;
+  border-bottom:1px solid var(--line);
+}
+.reward:last-child{border-bottom:none}
+.reward .cost{
+  font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;
+  min-width:62px;font-variant-numeric:tabular-nums;
+}
+.reward .name{flex:1;font-weight:500}
+.reward .lock{font-size:12px;color:var(--chalk-dim);letter-spacing:.06em;text-transform:uppercase}
+.reward button{
+  padding:8px 14px;border:none;border-radius:8px;cursor:pointer;
+  background:var(--accent);color:var(--accent-ink);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.08em;text-transform:uppercase;
+}
+.reward.locked .cost{color:var(--chalk-dim)}
+
+.empty{color:var(--chalk-dim);font-size:14px;padding:14px 0;text-align:center}
+.note{font-size:12px;color:var(--chalk-dim);margin-top:10px;line-height:1.5}
+.badge{
+  display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  background:var(--football);color:var(--cougar-ink);
+}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,100px);
+  background:var(--chalk);color:var(--ink);padding:12px 20px;border-radius:99px;
+  font-weight:600;font-size:15px;z-index:99;transition:transform .3s cubic-bezier(.2,.8,.2,1);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw;text-align:center;
+}
+.toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Jayden · 7th Grade · HTX ECNL RL</div>
+    <div class="board">
+      <div class="xp-total num" id="xpBalance">0</div>
+      <div class="xp-meta">XP to spend<br><b id="xpEarned">0</b> earned all-time
+        <span class="sync" id="syncDot">Not connected</span>
+      </div>
+    </div>
+    <div class="ladder">
+      <div class="ladder-bar"><div class="ladder-fill" id="ladderFill" style="width:0%"></div></div>
+      <div class="ladder-label"><span id="ladderNow">Next up</span><span id="ladderNext"></span></div>
+    </div>
+    <nav role="tablist">
+      <button class="tab" role="tab" data-tab="grades" aria-selected="true" style="--tabc:var(--cougar)">Grades</button>
+      <button class="tab" role="tab" data-tab="football" aria-selected="false" style="--tabc:var(--cougar)">Kicking</button>
+      <button class="tab" role="tab" data-tab="soccer" aria-selected="false" style="--tabc:var(--htx)">Soccer</button>
+      <button class="tab" role="tab" data-tab="rewards" aria-selected="false" style="--tabc:var(--chalk)">Rewards</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ================= GRADES ================= -->
+<section id="grades" class="on">
+  <div class="stats">
+    <div class="stat"><div class="num" id="gAvg">—</div><div class="cap">Avg score</div></div>
+    <div class="stat"><div class="num" id="gAB">0</div><div class="cap">A/B grades</div></div>
+    <div class="stat"><div class="num" id="gCount">0</div><div class="cap">Logged</div></div>
+  </div>
+
+  <div class="card">
+    <div class="rule"></div>
+    <h3>Log a grade</h3>
+    <div class="seg" id="gType">
+      <button data-v="daily" aria-pressed="true">Daily</button>
+      <button data-v="major" aria-pressed="false">Major</button>
+    </div>
+    <div class="row">
+      <div>
+        <label for="gSubject">Class</label>
+        <select id="gSubject"></select>
+      </div>
+      <div style="max-width:110px">
+        <label for="gScore">Score</label>
+        <input id="gScore" type="number" inputmode="numeric" min="0" max="120" placeholder="95">
+      </div>
+    </div>
+    <button class="btn" id="gSave">Add grade</button>
+    <p class="note">Major A 500 XP ($5) · Major B 200 XP ($2) · Daily A 50 XP · Daily B 25 XP. Below 80 still gets logged, no XP.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule"></div>
+    <h3>Report card</h3>
+    <div class="row">
+      <div>
+        <label for="rcPeriod">Grading period</label>
+        <select id="rcPeriod">
+          <option value="MP1">MP1 · ends Oct 7</option>
+          <option value="MP2">MP2 · ends Dec 18</option>
+          <option value="MP3">MP3 · ends Mar 11</option>
+          <option value="MP4">MP4 · ends May 27</option>
+        </select>
+      </div>
+      <div style="max-width:110px">
+        <label for="rcLetter">Grade</label>
+        <select id="rcLetter"><option>A</option><option>B</option><option>C</option><option>D</option><option>F</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="rcSubject">Class</label>
+        <select id="rcSubject"></select>
+      </div>
+    </div>
+    <button class="btn" id="rcSave">Add report card grade</button>
+    <p class="note">A 1,000 XP ($10) · B 500 XP ($5) per class — the same rates you already pay. Four nine-week periods: MP1 and MP2 are the fall semester, MP3 and MP4 the spring.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule"></div>
+    <h3>Grade history</h3>
+    <div class="seg" id="gView">
+      <button data-v="class" aria-pressed="true">By class</button>
+      <button data-v="recent" aria-pressed="false">Most recent</button>
+    </div>
+    <div id="gTape"></div>
+  </div>
+</section>
+
+<!-- ================= FOOTBALL ================= -->
+<section id="football">
+  <div class="stats">
+    <div class="stat"><div class="num" id="fPct">—</div><div class="cap">FG %</div></div>
+    <div class="stat"><div class="num" id="fMade">0</div><div class="cap">Makes</div></div>
+    <div class="stat"><div class="num" id="fLong">—</div><div class="cap">Long</div></div>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--cougar)"></div>
+    <h3>Team</h3>
+    <div id="teamSet"></div>
+    <div class="seg" id="fTeam" style="margin-bottom:10px">
+      <button data-v="A" aria-pressed="false">A team</button>
+      <button data-v="B" aria-pressed="false">B team</button>
+      <button data-v="C" aria-pressed="false">C team</button>
+    </div>
+    <p class="note">One-time milestone: A 1,000 XP · B 750 XP · C 500 XP. Tap again to clear.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--cougar)"></div>
+    <h3>Log a kick</h3>
+    <div class="seg" id="fKind">
+      <button data-v="fg" aria-pressed="true">Field goal</button>
+      <button data-v="pat" aria-pressed="false">Extra point</button>
+      <button data-v="kickoff" aria-pressed="false">Kickoff</button>
+    </div>
+    <div class="row" id="fDistWrap">
+      <div style="max-width:120px">
+        <label for="fDist">Yards</label>
+        <input id="fDist" type="number" inputmode="numeric" min="10" max="70" placeholder="32">
+      </div>
+      <div>
+        <label for="fWhere">Setting</label>
+        <select id="fWhere"><option>Game</option><option>Practice</option></select>
+      </div>
+    </div>
+    <div class="seg">
+      <button class="btn" id="fMakeBtn" style="letter-spacing:.08em">Good</button>
+      <button class="btn" id="fMissBtn" style="background:var(--ink);border:1px solid var(--line);color:var(--chalk-dim)">No good</button>
+    </div>
+    <p class="note">Game FG made 100 XP, +25 from 30 yds, +25 more from 40 yds. Extra point 40 XP. Practice kicks count for stats at quarter XP. Misses log for tracking, no XP.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--cougar)"></div>
+    <h3>Kick log</h3>
+    <div class="tape" id="fTape"></div>
+  </div>
+</section>
+
+<!-- ================= SOCCER ================= -->
+<section id="soccer">
+  <div class="stats">
+    <div class="stat"><div class="num" id="sCleanCount">0</div><div class="cap">Clean sheets</div></div>
+    <div class="stat"><div class="num" id="sDef">0</div><div class="cap">Goal-savers</div></div>
+    <div class="stat"><div class="num" id="sGames">0</div><div class="cap">Games</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="sGoals">0</div><div class="cap">Goals</div></div>
+    <div class="stat"><div class="num" id="sAssists">0</div><div class="cap">Assists</div></div>
+    <div class="stat"><div class="num" id="sEffort">—</div><div class="cap">Avg effort</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="sInt">—</div><div class="cap">Avg intensity</div></div>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--htx)"></div>
+    <h3>Rate a game</h3>
+    <div class="row">
+      <div>
+        <label for="sOpp">Opponent</label>
+        <input id="sOpp" type="text" placeholder="Optional">
+      </div>
+      <div style="max-width:130px">
+        <label for="sDate">Date</label>
+        <input id="sDate" type="date">
+      </div>
+    </div>
+    <label>Effort — did he empty the tank?</label>
+    <div class="seg rate" id="sEffortSeg">
+      <button data-v="1">1</button><button data-v="2">2</button><button data-v="3" aria-pressed="true">3</button><button data-v="4">4</button><button data-v="5">5</button>
+    </div>
+    <label>Intensity — duels, pressing, first to the ball</label>
+    <div class="seg rate" id="sIntSeg">
+      <button data-v="1">1</button><button data-v="2">2</button><button data-v="3" aria-pressed="true">3</button><button data-v="4">4</button><button data-v="5">5</button>
+    </div>
+    <label>Clean sheet — team kept them out</label>
+    <div class="seg" id="sClean">
+      <button data-v="no" aria-pressed="true">Conceded</button>
+      <button data-v="yes" aria-pressed="false">Clean sheet</button>
+    </div>
+    <div class="row">
+      <div>
+        <label>Goal-saving plays — blocks, last-man tackles, clearances</label>
+        <div class="step" data-step="defense">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="sDefenseVal">0<small>250 XP each</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Goals</label>
+        <div class="step" data-step="goals">
+          <button type="button" data-d="-1" aria-label="One fewer goal">−</button>
+          <span class="val" id="sGoalsVal">0<small>1,000 XP each</small></span>
+          <button type="button" data-d="1" aria-label="One more goal">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Assists</label>
+        <div class="step" data-step="assists">
+          <button type="button" data-d="-1" aria-label="One fewer assist">−</button>
+          <span class="val" id="sAssistsVal">0<small>500 XP each</small></span>
+          <button type="button" data-d="1" aria-label="One more assist">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="sNote">One thing he did well</label>
+        <input id="sNote" type="text" placeholder="Optional">
+      </div>
+    </div>
+    <button class="btn" id="sSave" style="background:var(--htx);color:var(--htx-ink)">Save game</button>
+    <p class="note" id="sXpPreview">Effort and intensity: 150 XP. Rate it together after the game so he hears why.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--htx)"></div>
+    <h3>Game log</h3>
+    <div class="tape" id="sTape"></div>
+  </div>
+</section>
+
+<!-- ================= REWARDS ================= -->
+<section id="rewards">
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Cash out</h3>
+    <p class="note" style="margin-top:0">100 XP = $1. Cash comes out in $10 blocks.</p>
+    <div class="step" data-step="payout">
+      <button type="button" data-d="-1" aria-label="Ten dollars less">−</button>
+      <span class="val" id="payoutVal">$0<small>0 XP</small></span>
+      <button type="button" data-d="1" aria-label="Ten dollars more">+</button>
+    </div>
+    <button class="btn" id="payoutBtn">Request payout</button>
+    <p class="note" id="payoutNote"></p>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Rewards</h3>
+    <div id="rewardList"></div>
+    <p class="note">Every reward shows what it's worth in cash, so picking one is a real trade against the money.</p>
+  </div>
+
+  <div class="card" id="saveCard" style="display:none">
+    <div class="rule" style="background:var(--htx)"></div>
+    <h3>Save bonus</h3>
+    <p class="note" style="margin-top:0" id="saveNote"></p>
+    <button class="btn" id="saveBtn" style="background:var(--htx);color:var(--htx-ink)">Claim save bonus</button>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Payouts</h3>
+    <div class="tape" id="payoutTape"></div>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Sync</h3>
+    <p id="syncLine" class="note" style="margin-top:0">Not connected.</p>
+    <div class="row">
+      <div>
+        <label for="endpoint">Apps Script web app URL</label>
+        <input id="endpoint" type="url" placeholder="https://script.google.com/.../exec">
+      </div>
+    </div>
+    <div class="row">
+      <div><button class="btn ghost" id="endpointSave">Save URL</button></div>
+      <div><button class="btn" id="syncBtn">Sync now</button></div>
+    </div>
+    <p class="note">All three phones point at the same URL and share one set of data. Entries merge, so two people logging at the same time won't overwrite each other.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Training XP</h3>
+    <div class="row">
+      <div>
+        <label for="trainXP">Total from the training app</label>
+        <input id="trainXP" type="number" inputmode="numeric" min="0" placeholder="0">
+      </div>
+    </div>
+    <button class="btn ghost" id="trainSave">Update training XP</button>
+    <p class="note" id="trainNote">Type in his current Joner training total so the number at the top is one combined score.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Everything, newest first</h3>
+    <div class="tape" id="allTape"></div>
+  </div>
+
+  <div class="card">
+    <div class="rule" style="background:var(--chalk)"></div>
+    <h3>Backup</h3>
+    <div class="row">
+      <div><button class="btn ghost" id="expBtn">Copy backup</button></div>
+      <div><button class="btn ghost" id="impBtn">Restore backup</button></div>
+    </div>
+    <p class="note">Data lives on this device. Copy a backup before switching phones or clearing Safari.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- storage (degrades to memory if blocked) ---------- */
+var KEY='jayden-season-hub-v1', mem=null;
+function load(){
+  try{ var r=localStorage.getItem(KEY); return r?JSON.parse(r):fresh(); }
+  catch(e){ return mem||fresh(); }
+}
+function save(){
+  mem=S;
+  try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  render();
+}
+function fresh(){ return {entries:[],team:null,trainingXP:0,trainingAuto:false,spent:[],tombstones:[],spentTombstones:[],metaDirty:false,lastSync:null}; }
+var S=load();
+['entries','spent','tombstones','spentTombstones'].forEach(function(k){ if(!Array.isArray(S[k])) S[k]=[]; });
+
+var CLASSES=['Math 7 TAP','Science 7 TAP','ELAR 7 TAP','TX History 7 TAP','Art 2','Theater 1','Athletics Boys 7','General Employability Skills'];
+var XP_PER_DOLLAR=100;          // 100 XP = $1
+var PAYOUT_BLOCK=10;            // cash out in $10 blocks
+var SAVE_DAYS=30, SAVE_RATE=0.10;
+var REWARDS=[
+  {c:1000,  n:'Sweets',                 d:10},
+  {c:2500,  n:'Sushi night',            d:25},
+  {c:5000,  n:'Family activity',        d:50},
+  {c:10000, n:'Big reward',             d:100}
+];
+function money(n){ return '$'+n.toLocaleString(); }
+
+var $=function(id){return document.getElementById(id)};
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+/* Strictly increasing change stamp, so a sync can tell what changed after it was sent. */
+var clock=0;
+function tick(){ clock=Math.max(clock+1,Date.now()); return clock; }
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show')},2200)}
+function short(iso){var d=new Date(iso);return (d.getMonth()+1)+'/'+d.getDate()}
+
+/* ---------- segmented controls ---------- */
+function seg(id,cb){
+  var el=$(id); if(!el) return;
+  el.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-v]'); if(!b)return;
+    [].forEach.call(el.querySelectorAll('button[data-v]'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+    if(cb)cb(b.dataset.v,b);
+  });
+}
+function segVal(id){var b=$(id).querySelector('[aria-pressed="true"]');return b?b.dataset.v:null}
+
+/* ---------- tabs ---------- */
+var ACC={
+  grades:{a:'var(--cougar)',i:'var(--cougar-ink)'},
+  football:{a:'var(--cougar)',i:'var(--cougar-ink)'},
+  soccer:{a:'var(--htx)',i:'var(--htx-ink)'},
+  rewards:{a:'var(--chalk)',i:'var(--ink)'}
+};
+[].forEach.call(document.querySelectorAll('.tab'),function(t){
+  t.addEventListener('click',function(){
+    [].forEach.call(document.querySelectorAll('.tab'),function(x){x.setAttribute('aria-selected',x===t?'true':'false')});
+    [].forEach.call(document.querySelectorAll('section'),function(s){s.classList.toggle('on',s.id===t.dataset.tab)});
+    var a=ACC[t.dataset.tab];
+    document.documentElement.style.setProperty('--accent',a.a);
+    document.documentElement.style.setProperty('--accent-ink',a.i);
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* ---------- XP rules ---------- */
+/* Priced against the family's existing rates at 100 XP = $1.
+   Report card  A $10 / B $5      Major grade  A $5 / B $2
+   Daily grades are the new layer, kept small on purpose.   */
+function gradeXP(type,score){
+  if(score>=90) return type==='major'?500:50;
+  if(score>=80) return type==='major'?200:25;
+  return 0;
+}
+function letterXP(l){return l==='A'?1000:l==='B'?500:0}
+function teamXP(t){return t==='A'?1000:t==='B'?750:t==='C'?500:0}
+function kickXP(kind,made,yards,where){
+  if(!made) return 0;
+  var base=0;
+  if(kind==='fg'){ base=100; if(yards>=30)base+=25; if(yards>=40)base+=25; }
+  else if(kind==='pat'){ base=40; }
+  else { base=40; }
+  return where==='Practice'?Math.round(base/4):base;
+}
+
+/* ---------- add / remove ---------- */
+function add(e){ e.id=uid(); e.at=e.at||new Date().toISOString(); e.dirty=tick(); S.entries.unshift(e); save(); queueSync(); }
+function remove(id){
+  var i=S.entries.findIndex(function(x){return x.id===id});
+  if(i>-1){S.entries.splice(i,1);S.tombstones.push(id);save();queueSync();toast('Entry removed')}
+}
+
+/* ---------- grades ---------- */
+[$('gSubject'),$('rcSubject')].forEach(function(sel){
+  CLASSES.forEach(function(c){var o=document.createElement('option');o.textContent=c;sel.appendChild(o)});
+});
+seg('gType');
+$('gSave').addEventListener('click',function(){
+  var sc=parseFloat($('gScore').value);
+  if(isNaN(sc)){toast('Enter a score first');$('gScore').focus();return}
+  var type=segVal('gType'), xp=gradeXP(type,sc);
+  add({kind:'grade',type:type,subject:$('gSubject').value,score:sc,xp:xp});
+  $('gScore').value='';
+  toast(xp?'+'+xp+' XP':'Logged — no XP under 80');
+});
+seg('gView',function(){ renderGradeHistory(); });
+$('rcSave').addEventListener('click',function(){
+  var l=$('rcLetter').value, xp=letterXP(l);
+  var sel=$('rcPeriod');
+  add({kind:'report',period:sel.value,periodLabel:sel.options[sel.selectedIndex].text,subject:$('rcSubject').value,letter:l,xp:xp});
+  toast(xp?'+'+xp+' XP':'Logged — no XP');
+});
+
+/* ---------- football ---------- */
+seg('fTeam',function(v){
+  if(S.team===v){ S.team=null; toast('Team cleared'); }
+  else { S.team=v; toast('+'+teamXP(v)+' XP — '+v+' team'); }
+  S.metaDirty=tick(); save(); queueSync();
+});
+seg('fKind',function(v){ $('fDistWrap').style.display = v==='fg' ? 'flex' : 'none'; });
+function logKick(made){
+  var kind=segVal('fKind'), where=$('fWhere').value;
+  var yards=kind==='fg'?parseInt($('fDist').value,10):null;
+  if(kind==='fg' && (isNaN(yards)||!yards)){toast('Enter the distance');$('fDist').focus();return}
+  var xp=kickXP(kind,made,yards,where);
+  add({kind:'kick',kickType:kind,made:made,yards:yards,where:where,xp:xp});
+  toast(made?(xp?'+'+xp+' XP — good':'Logged'):'Miss logged');
+}
+$('fMakeBtn').addEventListener('click',function(){logKick(true)});
+$('fMissBtn').addEventListener('click',function(){logKick(false)});
+
+/* ---------- soccer ---------- */
+seg('sEffortSeg',function(){sPreview()}); seg('sIntSeg',function(){sPreview()});
+seg('sClean',function(){sPreview()});
+$('sDate').value=new Date().toISOString().slice(0,10);
+
+var GOAL_XP=1000, ASSIST_XP=500, CLEAN_XP=1000, DEF_XP=250;
+var sCount={goals:0,assists:0,defense:0};
+var STEP_META={goals:{id:'sGoalsVal',lbl:'1,000 XP each'},
+               assists:{id:'sAssistsVal',lbl:'500 XP each'},
+               defense:{id:'sDefenseVal',lbl:'250 XP each'}};
+function drawStep(k){
+  var m=STEP_META[k];
+  $(m.id).innerHTML = sCount[k]+'<small>'+m.lbl+'</small>';
+}
+function sPreview(){
+  var ef=parseInt(segVal('sEffortSeg'),10), it=parseInt(segVal('sIntSeg'),10);
+  var base=(ef+it)*25;
+  var clean=segVal('sClean')==='yes'?CLEAN_XP:0;
+  var bonus=clean + sCount.defense*DEF_XP + sCount.goals*GOAL_XP + sCount.assists*ASSIST_XP;
+  var msg='Effort and intensity: '+base+' XP.';
+  if(bonus) msg += ' Defending and attacking: '+bonus.toLocaleString()+' XP. Total '+(base+bonus).toLocaleString()+' XP.';
+  else msg += ' Rate it together after the game so he hears why.';
+  $('sXpPreview').textContent=msg;
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.step button[data-d]'); if(!b) return;
+  var k=b.closest('.step').dataset.step;
+  var d=parseInt(b.dataset.d,10);
+  if(k==='payout'){
+    payoutDollars=Math.max(0,payoutDollars + d*PAYOUT_BLOCK);
+    drawPayout(); return;
+  }
+  sCount[k]=Math.max(0,Math.min(20,sCount[k]+d));
+  drawStep(k); sPreview();
+});
+$('sSave').addEventListener('click',function(){
+  var ef=parseInt(segVal('sEffortSeg'),10), it=parseInt(segVal('sIntSeg'),10);
+  var g=sCount.goals, a=sCount.assists, df=sCount.defense;
+  var cs=segVal('sClean')==='yes';
+  var xp=(ef+it)*25 + g*GOAL_XP + a*ASSIST_XP + df*DEF_XP + (cs?CLEAN_XP:0);
+  add({kind:'soccer',opponent:$('sOpp').value.trim(),date:$('sDate').value,
+       effort:ef,intensity:it,goals:g,assists:a,defense:df,cleanSheet:cs,
+       note:$('sNote').value.trim(),xp:xp});
+  $('sOpp').value='';$('sNote').value='';
+  sCount={goals:0,assists:0,defense:0};
+  ['goals','assists','defense'].forEach(drawStep);
+  [].forEach.call($('sClean').querySelectorAll('button'),function(b,i){b.setAttribute('aria-pressed',i===0?'true':'false')});
+  sPreview();
+  toast('+'+xp.toLocaleString()+' XP logged');
+});
+
+/* ---------- training XP + rewards ---------- */
+$('trainSave').addEventListener('click',function(){
+  var v=parseInt($('trainXP').value,10);
+  if(isNaN(v)||v<0){toast('Enter a number');return}
+  S.trainingXP=v; S.metaDirty=tick(); save(); queueSync(); toast('Training XP updated');
+});
+function earned(){
+  return S.entries.reduce(function(a,e){return a+(e.xp||0)},0) + teamXP(S.team) + (S.trainingXP||0);
+}
+function spentTotal(){ return S.spent.reduce(function(a,s){return a+s.cost},0) }
+function balance(){ return earned()-spentTotal() }
+
+/* ----- cash payouts ----- */
+var payoutDollars=0;
+function drawPayout(){
+  var xp=payoutDollars*XP_PER_DOLLAR;
+  $('payoutVal').innerHTML=money(payoutDollars)+'<small>'+xp.toLocaleString()+' XP</small>';
+  var bal=balance();
+  $('payoutNote').textContent = payoutDollars===0
+    ? 'Most you can take right now: '+money(Math.floor(bal/XP_PER_DOLLAR/PAYOUT_BLOCK)*PAYOUT_BLOCK)+'.'
+    : (xp>bal ? 'Not enough XP for that yet.' : 'Leaves '+(bal-xp).toLocaleString()+' XP in the bank.');
+}
+function requestPayout(){
+  var xp=payoutDollars*XP_PER_DOLLAR;
+  if(!xp){ toast('Pick an amount first'); return; }
+  if(xp>balance()){ toast('Not enough XP yet'); return; }
+  if(!confirm('Request '+money(payoutDollars)+' for '+xp.toLocaleString()+' XP?')) return;
+  S.spent.unshift({id:uid(),at:new Date().toISOString(),name:'Cash '+money(payoutDollars),
+    cost:xp,type:'payout',dollars:payoutDollars,paid:false,dirty:tick()});
+  payoutDollars=0; drawPayout();
+  save(); queueSync(); toast('Payout requested');
+}
+function markPaid(id){
+  var x=S.spent.find(function(v){return v.id===id});
+  if(!x) return;
+  if(!confirm('Mark '+x.name+' as handed over?')) return;
+  x.paid=true; x.paidAt=new Date().toISOString(); x.dirty=tick();
+  save(); queueSync(); toast('Marked paid');
+}
+
+/* ----- save bonus ----- */
+function saveClockStart(){
+  var times=[];
+  S.spent.forEach(function(x){ times.push(x.at); });
+  S.entries.forEach(function(e){ if(e.kind==='bonus') times.push(e.at); });
+  if(!times.length){
+    var first=S.entries.length ? S.entries[S.entries.length-1].at : null;
+    return first ? new Date(first) : null;
+  }
+  times.sort();
+  return new Date(times[times.length-1]);
+}
+function saveDaysHeld(){
+  var st=saveClockStart();
+  if(!st) return null;
+  return Math.floor((Date.now()-st.getTime())/86400000);
+}
+function claimSaveBonus(){
+  var bal=balance();
+  var bonus=Math.round(bal*SAVE_RATE);
+  if(bonus<=0){ toast('Nothing to bonus yet'); return; }
+  if(!confirm('Claim '+bonus.toLocaleString()+' XP for leaving it alone '+SAVE_DAYS+' days?')) return;
+  add({kind:'bonus',label:'Save bonus',xp:bonus});
+  toast('+'+bonus.toLocaleString()+' XP save bonus');
+}
+
+function redeem(r){
+  if(balance()<r.c){toast('Not there yet');return}
+  if(!confirm('Claim "'+r.n+'" for '+r.c.toLocaleString()+' XP? That is '+money(r.d)+' of value.'))return;
+  S.spent.unshift({id:uid(),at:new Date().toISOString(),name:r.n,cost:r.c,type:'reward',paid:true,dirty:tick()});
+  save(); queueSync(); toast(r.n+' redeemed');
+}
+
+/* ---------- export / import ---------- */
+$('expBtn').addEventListener('click',function(){
+  var t=JSON.stringify(S);
+  if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){toast('Backup copied')},function(){prompt('Copy this:',t)})}
+  else prompt('Copy this:',t);
+});
+$('impBtn').addEventListener('click',function(){
+  var t=prompt('Paste a backup. This replaces everything currently saved.');
+  if(!t)return;
+  try{var d=JSON.parse(t);if(!d.entries)throw 0;S=d;save();toast('Backup restored')}
+  catch(e){toast('That backup could not be read')}
+});
+
+/* ---------- sync ---------- */
+/* Paste your Apps Script /exec URL between the quotes once and every phone works with no setup. */
+var DEFAULT_ENDPOINT='https://script.google.com/macros/s/AKfycbzUkcrZdTP6SJYF9J7qGjlTmRUOhdAGNMUPAHNeNHj1dDYLO2SFUSMGfaz3hyTeAJM/exec';
+var EP_KEY='jayden-season-endpoint';
+var syncTimer=null, syncing=false;
+
+function endpoint(){
+  try{ return localStorage.getItem(EP_KEY) || DEFAULT_ENDPOINT; }
+  catch(e){ return DEFAULT_ENDPOINT; }
+}
+function setSync(state,msg){
+  var d=$('syncDot'); if(d){ d.className='sync '+(state||''); d.textContent=msg; }
+  var l=$('syncLine'); if(l){ l.textContent = endpoint() ? msg : 'Not connected. Paste the web app URL below.'; }
+}
+function queueSync(){
+  if(!endpoint()) return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(function(){ syncNow(true); }, 1800);
+}
+function overlay(server,local,dead){
+  var ids={}; local.forEach(function(x){ids[x.id]=1});
+  return local.concat(server.filter(function(x){return !ids[x.id] && dead.indexOf(x.id)<0}));
+}
+function syncNow(quiet){
+  var url=endpoint();
+  if(!url){ if(!quiet) toast('Add the web app URL first'); return; }
+  if(syncing) return;
+  syncing=true; setSync('','Syncing...');
+
+  var sentAt=tick();
+  var sentTomb=S.tombstones.slice(), sentSpentTomb=S.spentTombstones.slice();
+  var body={
+    action:'push',
+    entries:S.entries.filter(function(e){return e.dirty}),
+    spent:S.spent.filter(function(x){return x.dirty}),
+    tombstones:S.tombstones,
+    spentTombstones:S.spentTombstones
+  };
+  if(S.metaDirty) body.meta={team:S.team===null?'':S.team,trainingXP:S.trainingXP||0};
+
+  fetch(url,{method:'POST',body:JSON.stringify(body)})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      if(!d||!d.ok) throw new Error((d&&d.error)||'rejected');
+      // Anything logged or deleted while this request was in flight wasn't in it.
+      // Lay those changes back over the server copy instead of dropping them.
+      var later=function(x){ return typeof x.dirty==='number' && x.dirty>sentAt; };
+      var tomb=S.tombstones.filter(function(id){return sentTomb.indexOf(id)<0});
+      var spTomb=S.spentTombstones.filter(function(id){return sentSpentTomb.indexOf(id)<0});
+      S.entries=overlay(d.entries||[], S.entries.filter(later), tomb);
+      S.spent=overlay(d.spent||[], S.spent.filter(later), spTomb);
+      S.tombstones=tomb; S.spentTombstones=spTomb;
+      var metaLater=typeof S.metaDirty==='number' && S.metaDirty>sentAt;
+      if(!metaLater){ S.team=d.team||null; S.trainingXP=d.trainingXP||0; S.metaDirty=false; }
+      S.trainingAuto=!!d.trainingAuto;
+      S.lastSync=new Date().toISOString();
+      syncing=false; save();
+      setSync('ok','Synced '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}));
+      if(!quiet) toast('Synced');
+      if(tomb.length||spTomb.length||metaLater||S.entries.some(later)||S.spent.some(later)) queueSync();
+    })
+    .catch(function(err){
+      syncing=false;
+      setSync('err','Sync failed - saved on this phone');
+      if(!quiet) toast('Sync failed. Check the URL.');
+    });
+}
+
+/* ---------- rendering ---------- */
+function tapeRow(e){
+  var dot='var(--cougar)',cls='',what='',sub='',xp=e.xp||0;
+  if(e.kind==='grade'){
+    what='<b>'+e.subject+'</b> · '+e.score;
+    sub=(e.type==='major'?'Major grade':'Daily grade');
+  } else if(e.kind==='report'){
+    dot='var(--cougar)';
+    what='<b>'+e.subject+'</b> · '+e.letter;
+    sub='Report card — '+(e.periodLabel||e.period);
+  } else if(e.kind==='kick'){
+    dot='var(--cougar)';cls=' hollow';
+    var nm=e.kickType==='fg'?e.yards+' yd FG':e.kickType==='pat'?'Extra point':'Kickoff';
+    what='<b>'+nm+'</b> · '+(e.made?'Good':'No good');
+    sub=e.where;
+  } else if(e.kind==='bonus'){
+    dot='var(--htx)';
+    what='<b>Save bonus</b>';
+    sub='Left the balance alone for '+SAVE_DAYS+' days';
+  } else if(e.kind==='soccer'){
+    dot='var(--htx)';
+    var tally=[];
+    if(e.cleanSheet) tally.push('clean sheet');
+    if(e.defense) tally.push(e.defense+(e.defense===1?' goal-saver':' goal-savers'));
+    if(e.goals) tally.push(e.goals+(e.goals===1?' goal':' goals'));
+    if(e.assists) tally.push(e.assists+(e.assists===1?' assist':' assists'));
+    what='<b>'+(e.opponent||'Game')+'</b> · E'+e.effort+' I'+e.intensity+(tally.length?' · '+tally.join(', '):'');
+    sub=e.note||'';
+  }
+  return '<div class="tape-row'+cls+'" style="--dot:'+dot+'">'+
+    '<span class="tape-when">'+short(e.at)+'</span>'+
+    '<span class="tape-what">'+what+(sub?'<span class="tape-sub">'+sub+'</span>':'')+'</span>'+
+    '<span class="tape-xp'+(xp?'':' zero')+'">'+(xp?'+'+xp:'0')+'</span>'+
+    '<button class="del" data-del="'+e.id+'" aria-label="Remove entry">×</button></div>';
+}
+function renderGradeHistory(){
+  var all = S.entries.filter(function(e){return e.kind==='grade'||e.kind==='report'});
+  var el = $('gTape');
+  if(!all.length){ el.innerHTML='<div class="empty">No grades logged yet. Add the first one above.</div>'; return; }
+
+  if(segVal('gView')==='recent'){
+    el.innerHTML = '<div class="tape">'+all.map(tapeRow).join('')+'</div>';
+    return;
+  }
+
+  // group by class, ordered by most recent activity
+  var groups={}, order=[];
+  all.forEach(function(e){
+    var k=e.subject||'Other';
+    if(!groups[k]){ groups[k]=[]; order.push(k); }
+    groups[k].push(e);
+  });
+
+  el.innerHTML = order.map(function(k){
+    var rows=groups[k];
+    var scored=rows.filter(function(e){return e.kind==='grade'}).map(function(e){return e.score});
+    var avg = scored.length ? Math.round(scored.reduce(function(a,b){return a+b},0)/scored.length) : null;
+    var n=rows.length;
+    return '<div class="grp">'+
+      '<div class="grp-head">'+
+        '<span class="gname">'+k+'</span>'+
+        '<span class="gcount">'+n+(n===1?' entry':' entries')+'</span>'+
+        '<span class="gavg">'+(avg===null?'—':avg)+'</span>'+
+      '</div>'+
+      '<div class="tape">'+rows.map(tapeRow).join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function paint(el,list,emptyMsg){
+  el.innerHTML = list.length ? list.map(tapeRow).join('') : '<div class="empty">'+emptyMsg+'</div>';
+}
+
+function render(){
+  var bal=balance(), earn=earned();
+  $('xpBalance').textContent=bal.toLocaleString();
+  $('xpEarned').textContent=earn.toLocaleString();
+
+  var next=REWARDS.find(function(r){return bal<r.c});
+  if(next){
+    var prev=REWARDS.filter(function(r){return r.c<=bal}).pop();
+    var floor=prev?prev.c:0;
+    var pct=Math.max(0,Math.min(100,((bal-floor)/(next.c-floor))*100));
+    $('ladderFill').style.width=pct+'%';
+    $('ladderNow').textContent=next.n;
+    $('ladderNext').textContent=(next.c-bal).toLocaleString()+' XP to go';
+  } else {
+    $('ladderFill').style.width='100%';
+    $('ladderNow').textContent='Every reward unlocked';
+    $('ladderNext').textContent='';
+  }
+
+  var gs=S.entries.filter(function(e){return e.kind==='grade'});
+  var scored=gs.map(function(e){return e.score});
+  $('gAvg').textContent = scored.length ? Math.round(scored.reduce(function(a,b){return a+b},0)/scored.length) : '—';
+  $('gAB').textContent = gs.filter(function(e){return e.score>=80}).length + S.entries.filter(function(e){return e.kind==='report'&&(e.letter==='A'||e.letter==='B')}).length;
+  $('gCount').textContent = gs.length;
+  renderGradeHistory();
+
+  var fgs=S.entries.filter(function(e){return e.kind==='kick'&&e.kickType==='fg'});
+  var made=fgs.filter(function(e){return e.made});
+  $('fPct').textContent = fgs.length ? Math.round(made.length/fgs.length*100)+'%' : '—';
+  $('fMade').textContent = made.length+'/'+fgs.length;
+  $('fLong').textContent = made.length ? Math.max.apply(null,made.map(function(e){return e.yards||0})) : '—';
+  [].forEach.call($('fTeam').querySelectorAll('button'),function(b){b.setAttribute('aria-pressed',S.team===b.dataset.v?'true':'false')});
+  $('teamSet').innerHTML = S.team ? '<p style="margin:0 0 12px"><span class="badge">'+S.team+' team</span> <span style="color:var(--chalk-dim);font-size:13px">+'+teamXP(S.team).toLocaleString()+' XP</span></p>' : '';
+  paint($('fTape'), S.entries.filter(function(e){return e.kind==='kick'}), 'No kicks logged yet.');
+
+  var sg=S.entries.filter(function(e){return e.kind==='soccer'});
+  var avg=function(k){return sg.length?(sg.reduce(function(a,e){return a+e[k]},0)/sg.length).toFixed(1):'—'};
+  $('sEffort').textContent=avg('effort');
+  $('sInt').textContent=avg('intensity');
+  $('sGames').textContent=sg.length;
+  $('sGoals').textContent=sg.reduce(function(a,e){return a+(e.goals||0)},0);
+  $('sAssists').textContent=sg.reduce(function(a,e){return a+(e.assists||0)},0);
+  $('sCleanCount').textContent=sg.filter(function(e){return e.cleanSheet}).length;
+  $('sDef').textContent=sg.reduce(function(a,e){return a+(e.defense||0)},0);
+  paint($('sTape'), sg, 'No games rated yet.');
+
+  $('trainXP').value = S.trainingXP || '';
+  if(document.activeElement !== $('endpoint')) $('endpoint').value = endpoint();
+  if(S.trainingAuto){
+    $('trainXP').disabled=true; $('trainSave').disabled=true;
+    $('trainNote').textContent='Reading straight from the training sheet, nothing to type in. Currently '+(S.trainingXP||0).toLocaleString()+' XP.';
+  } else {
+    $('trainXP').disabled=false; $('trainSave').disabled=false;
+    $('trainNote').textContent='Type in his current Joner training total so the number at the top is one combined score.';
+  }
+
+  $('rewardList').innerHTML = REWARDS.map(function(r){
+    var ok=bal>=r.c;
+    return '<div class="reward'+(ok?'':' locked')+'">'+
+      '<span class="cost">'+r.c.toLocaleString()+'</span>'+
+      '<span class="name">'+r.n+'<span class="tape-sub">worth '+money(r.d)+' in cash</span></span>'+
+      (ok?'<button data-redeem="'+r.c+'">Claim</button>':'<span class="lock">'+(r.c-bal).toLocaleString()+' to go</span>')+
+      '</div>';
+  }).join('');
+
+  drawPayout();
+
+  var held=saveDaysHeld();
+  if(held !== null && held >= SAVE_DAYS && bal > 0){
+    $('saveCard').style.display='block';
+    $('saveNote').textContent='Untouched for '+held+' days. Claim '+Math.round(bal*SAVE_RATE).toLocaleString()+' XP, ten percent of the balance.';
+  } else {
+    $('saveCard').style.display='none';
+  }
+
+  var pay=S.spent.filter(function(x){return x.type==='payout'});
+  $('payoutTape').innerHTML = pay.length ? pay.map(function(x){
+    return '<div class="tape-row" style="--dot:'+(x.paid?'var(--htx)':'var(--alert)')+'">'+
+      '<span class="tape-when">'+short(x.at)+'</span>'+
+      '<span class="tape-what"><b>'+x.name+'</b><span class="tape-sub">'+
+        (x.paid?'Handed over':'Waiting on you')+'</span></span>'+
+      '<span class="tape-xp spend">−'+x.cost.toLocaleString()+'</span>'+
+      (x.paid?'':'<button class="del" data-paid="'+x.id+'" aria-label="Mark paid" style="font-size:13px;letter-spacing:.06em">PAY</button>')+
+      '</div>';
+  }).join('') : '<div class="empty">No payouts yet.</div>';
+
+  var all=S.entries.slice(0,40).map(tapeRow);
+  var sp=S.spent.slice(0,10).map(function(s){
+    return '<div class="tape-row" style="--dot:var(--alert)"><span class="tape-when">'+short(s.at)+'</span>'+
+      '<span class="tape-what"><b>'+s.name+'</b><span class="tape-sub">Reward redeemed</span></span>'+
+      '<span class="tape-xp spend">−'+s.cost.toLocaleString()+'</span></div>';
+  });
+  $('allTape').innerHTML = (all.length||sp.length) ? sp.concat(all).join('') : '<div class="empty">Nothing logged yet.</div>';
+}
+
+document.addEventListener('click',function(e){
+  var d=e.target.closest('[data-del]');
+  if(d){ if(confirm('Remove this entry?')) remove(d.dataset.del); return; }
+  var pd=e.target.closest('[data-paid]');
+  if(pd){ markPaid(pd.dataset.paid); return; }
+  var r=e.target.closest('[data-redeem]');
+  if(r){ var cost=parseInt(r.dataset.redeem,10); redeem(REWARDS.find(function(x){return x.c===cost})); }
+});
+
+$('endpointSave').addEventListener('click',function(){
+  var u=$('endpoint').value.trim();
+  if(u && u.indexOf('/exec')<0){ toast('That URL should end in /exec'); return; }
+  try{ localStorage.setItem(EP_KEY,u); }catch(e){}
+  toast(u?'URL saved':'URL cleared');
+  if(u){ S.metaDirty=tick(); syncNow(); } else setSync('','Not connected');
+});
+$('syncBtn').addEventListener('click',function(){ syncNow(); });
+$('payoutBtn').addEventListener('click',requestPayout);
+$('saveBtn').addEventListener('click',claimSaveBonus);
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden && endpoint()) syncNow(true);
+});
+setInterval(function(){ if(endpoint() && !document.hidden) syncNow(true); }, 60000);
+
+['goals','assists','defense'].forEach(drawStep); sPreview();
+render();
+setSync('', endpoint()?'Ready':'Not connected');
+if(endpoint()) syncNow(true);
+})();
+</script>
+</body>
+</html>
