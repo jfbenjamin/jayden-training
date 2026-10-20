@@ -272,12 +272,6 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 
 <!-- ================= GRADES ================= -->
 <section id="grades" class="on">
-  <div class="stats">
-    <div class="stat"><div class="num" id="gAvg">—</div><div class="cap">Avg score</div></div>
-    <div class="stat"><div class="num" id="gAB">0</div><div class="cap">A/B grades</div></div>
-    <div class="stat"><div class="num" id="gCount">0</div><div class="cap">Logged</div></div>
-  </div>
-
   <div class="card">
     <div class="rule"></div>
     <h3>Log a grade</h3>
@@ -293,6 +287,16 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
       <div style="max-width:110px">
         <label for="gScore">Score</label>
         <input id="gScore" type="number" inputmode="numeric" min="0" max="120" placeholder="95">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="gDate">Date of the assignment</label>
+        <input id="gDate" type="date">
+      </div>
+      <div style="max-width:110px">
+        <label>Counts in</label>
+        <div id="gDateMP" class="num" style="font-size:22px;font-weight:700;padding:9px 0">—</div>
       </div>
     </div>
     <button class="btn" id="gSave">Add grade</button>
@@ -330,6 +334,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
   <div class="card">
     <div class="rule"></div>
     <h3>Grade history</h3>
+    <div class="row">
+      <div>
+        <label for="gPeriod">Grading period</label>
+        <select id="gPeriod"></select>
+      </div>
+    </div>
     <div class="seg" id="gView">
       <button data-v="class" aria-pressed="true">By class</button>
       <button data-v="recent" aria-pressed="false">Most recent</button>
@@ -603,6 +613,21 @@ var clock=0;
 function tick(){ clock=Math.max(clock+1,Date.now()); return clock; }
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show')},2200)}
 function short(iso){var d=new Date(iso);return (d.getMonth()+1)+'/'+d.getDate()}
+/* Calendar days as local YYYY-MM-DD (toISOString is UTC, which is tomorrow after 7pm in Houston). */
+function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function dayOf(iso){var d=new Date(iso);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function shortDay(ymd){var p=ymd.split('-');return (+p[1])+'/'+(+p[2])}
+
+/* TISD 2026-27 nine-week grading periods. Update the end dates each August. */
+var MPS=[
+  {k:'MP1',end:'2026-10-07',label:'MP1 · ends Oct 7'},
+  {k:'MP2',end:'2026-12-18',label:'MP2 · ends Dec 18'},
+  {k:'MP3',end:'2027-03-11',label:'MP3 · ends Mar 11'},
+  {k:'MP4',end:'2027-05-27',label:'MP4 · ends May 27'}
+];
+function mpOf(ymd){ for(var i=0;i<MPS.length;i++) if(ymd<=MPS[i].end) return MPS[i].k; return MPS[MPS.length-1].k; }
+function gradeDay(e){ return e.date || dayOf(e.at); }
+function entryMP(e){ return e.kind==='report' ? e.period : mpOf(gradeDay(e)); }
 
 /* ---------- segmented controls ---------- */
 function seg(id,cb){
@@ -668,11 +693,28 @@ seg('gType');
 $('gSave').addEventListener('click',function(){
   var sc=parseFloat($('gScore').value);
   if(isNaN(sc)){toast('Enter a score first');$('gScore').focus();return}
+  var day=$('gDate').value;
+  if(!day){toast('Pick the date');$('gDate').focus();return}
   var type=segVal('gType'), xp=gradeXP(type,sc);
-  add({kind:'grade',type:type,subject:$('gSubject').value,score:sc,xp:xp});
+  add({kind:'grade',type:type,subject:$('gSubject').value,score:sc,date:day,xp:xp});
   $('gScore').value='';
-  toast(xp?'+'+xp+' XP':'Logged — no XP under 80');
+  toast((xp?'+'+xp+' XP':'Logged — no XP under 80')+' · '+mpOf(day));
 });
+$('gDate').value=today(); $('gDate').max=today();
+function drawDateMP(){ $('gDateMP').textContent = $('gDate').value ? mpOf($('gDate').value) : '—'; }
+$('gDate').addEventListener('input',drawDateMP); $('gDate').addEventListener('change',drawDateMP); drawDateMP();
+
+/* History opens on the current period; earlier periods stay one tap away. */
+var curMP=mpOf(today());
+MPS.forEach(function(m){
+  var o=document.createElement('option'); o.value=m.k;
+  o.textContent=m.k+(m.k===curMP?' · current':(m.end<today()?' · ended '+shortDay(m.end):''));
+  $('gPeriod').appendChild(o);
+});
+$('gPeriod').value=curMP;
+$('gPeriod').addEventListener('change',function(){ renderGradeHistory(); });
+/* Report cards arrive after a period closes, so default to the latest one that has ended. */
+(function(){ var done=MPS.filter(function(m){return m.end<today()}); if(done.length) $('rcPeriod').value=done[done.length-1].k; })();
 seg('gView',function(){ renderGradeHistory(); });
 $('rcSave').addEventListener('click',function(){
   var l=$('rcLetter').value, xp=letterXP(l);
@@ -702,7 +744,7 @@ $('fMissBtn').addEventListener('click',function(){logKick(false)});
 /* ---------- soccer ---------- */
 seg('sEffortSeg',function(){sPreview()}); seg('sIntSeg',function(){sPreview()});
 seg('sClean',function(){sPreview()});
-$('sDate').value=new Date().toISOString().slice(0,10);
+$('sDate').value=today();
 
 var GOAL_XP=1000, ASSIST_XP=500, CLEAN_XP=1000, DEF_XP=250;
 var sCount={goals:0,assists:0,defense:0};
@@ -934,15 +976,17 @@ function tapeRow(e){
     sub=e.note||'';
   }
   return '<div class="tape-row'+cls+'" style="--dot:'+dot+'">'+
-    '<span class="tape-when">'+short(e.at)+'</span>'+
+    '<span class="tape-when">'+(e.date?shortDay(e.date):short(e.at))+'</span>'+
     '<span class="tape-what">'+what+(sub?'<span class="tape-sub">'+sub+'</span>':'')+'</span>'+
     '<span class="tape-xp'+(xp?'':' zero')+'">'+(xp?'+'+xp:'0')+'</span>'+
     '<button class="del" data-del="'+e.id+'" aria-label="Remove entry">×</button></div>';
 }
 function renderGradeHistory(){
-  var all = S.entries.filter(function(e){return e.kind==='grade'||e.kind==='report'});
+  var mp = $('gPeriod').value;
+  var all = S.entries.filter(function(e){return (e.kind==='grade'||e.kind==='report') && entryMP(e)===mp});
+  all.sort(function(a,b){ var x=gradeDay(b), y=gradeDay(a); return x<y?-1:x>y?1:(b.at<a.at?-1:1); });
   var el = $('gTape');
-  if(!all.length){ el.innerHTML='<div class="empty">No grades logged yet. Add the first one above.</div>'; return; }
+  if(!all.length){ el.innerHTML='<div class="empty">Nothing logged for '+mp+' yet.</div>'; return; }
 
   if(segVal('gView')==='recent'){
     el.innerHTML = '<div class="tape">'+all.map(tapeRow).join('')+'</div>';
@@ -996,11 +1040,6 @@ function render(){
     $('ladderNext').textContent='';
   }
 
-  var gs=S.entries.filter(function(e){return e.kind==='grade'});
-  var scored=gs.map(function(e){return e.score});
-  $('gAvg').textContent = scored.length ? Math.round(scored.reduce(function(a,b){return a+b},0)/scored.length) : '—';
-  $('gAB').textContent = gs.filter(function(e){return e.score>=80}).length + S.entries.filter(function(e){return e.kind==='report'&&(e.letter==='A'||e.letter==='B')}).length;
-  $('gCount').textContent = gs.length;
   renderGradeHistory();
 
   var fgs=S.entries.filter(function(e){return e.kind==='kick'&&e.kickType==='fg'});
