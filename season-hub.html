@@ -626,7 +626,9 @@ var MPS=[
 ];
 function mpOf(ymd){ for(var i=0;i<MPS.length;i++) if(ymd<=MPS[i].end) return MPS[i].k; return MPS[MPS.length-1].k; }
 function gradeDay(e){ return e.date || dayOf(e.at); }
-function entryMP(e){ return e.kind==='report' ? e.period : mpOf(gradeDay(e)); }
+/* Grades logged before the date picker (all by Oct 10, 2026) have no assignment date; every one of them
+   was an MP1 grade, including the batch caught up on Oct 10 after MP1 closed. */
+function entryMP(e){ return e.kind==='report' ? e.period : e.date ? mpOf(e.date) : 'MP1'; }
 
 /* ---------- segmented controls ---------- */
 function seg(id,cb){
