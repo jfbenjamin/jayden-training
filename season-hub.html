@@ -158,6 +158,10 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .step .val small{display:block;font-family:'Inter',sans-serif;font-size:11px;
   font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);margin-top:-2px}
 .stats+.stats{margin-top:-4px}
+.step.sm button{width:42px;font-size:20px;padding:11px 0}
+.step.sm .val{font-size:22px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.grid2 .step{margin-bottom:10px}
 
 /* grouped grade history */
 .grp{margin-bottom:6px}
@@ -264,7 +268,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
     </div>
     <nav role="tablist">
       <button class="tab" role="tab" data-tab="grades" aria-selected="true" style="--tabc:var(--cougar)">Grades</button>
-      <button class="tab" role="tab" data-tab="football" aria-selected="false" style="--tabc:var(--cougar)">Kicking</button>
+      <!-- Kicking is hidden for the off-season; its section, log and XP are kept. Restore this tab in August:
+      <button class="tab" role="tab" data-tab="football" aria-selected="false" style="--tabc:var(--cougar)">Kicking</button> -->
+      <button class="tab" role="tab" data-tab="basketball" aria-selected="false" style="--tabc:var(--cougar)">Basketball</button>
       <button class="tab" role="tab" data-tab="soccer" aria-selected="false" style="--tabc:var(--htx)">Soccer</button>
       <button class="tab" role="tab" data-tab="rewards" aria-selected="false" style="--tabc:var(--chalk)">Rewards</button>
     </nav>
@@ -396,6 +402,136 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
     <div class="rule" style="background:var(--cougar)"></div>
     <h3>Kick log</h3>
     <div class="tape" id="fTape"></div>
+  </div>
+</section>
+
+<!-- ================= BASKETBALL ================= -->
+<section id="basketball">
+  <div class="stats">
+    <div class="stat"><div class="num" id="bPpg">—</div><div class="cap">Points / game</div></div>
+    <div class="stat"><div class="num" id="bShots">—</div><div class="cap">Shots / game</div></div>
+    <div class="stat"><div class="num" id="bGames">0</div><div class="cap">Games</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="bReb">—</div><div class="cap">Rebounds / game</div></div>
+    <div class="stat"><div class="num" id="bAst">—</div><div class="cap">Assists / game</div></div>
+    <div class="stat"><div class="num" id="bFt">—</div><div class="cap">Free throws</div></div>
+  </div>
+
+  <div class="card">
+    <div class="rule"></div>
+    <h3>Team</h3>
+    <div id="bTeamSet"></div>
+    <div class="seg" id="bTeam" style="margin-bottom:10px">
+      <button data-v="A" aria-pressed="false">A team</button>
+      <button data-v="B" aria-pressed="false">B team</button>
+      <button data-v="C" aria-pressed="false">C team</button>
+    </div>
+    <p class="note" id="bTeamNote">Tap his team when the roster is posted. One-time bonus: A 1,000 · B 750 · C 500 XP.</p>
+  </div>
+
+  <div class="card">
+    <div class="rule"></div>
+    <h3>Log a game</h3>
+    <div class="row">
+      <div>
+        <label for="bOpp">Opponent</label>
+        <input id="bOpp" type="text" placeholder="Optional">
+      </div>
+      <div style="max-width:150px">
+        <label for="bDate">Date</label>
+        <input id="bDate" type="date">
+      </div>
+    </div>
+    <label>Effort — did he empty the tank?</label>
+    <div class="seg rate" id="bEffortSeg">
+      <button data-v="1">1</button><button data-v="2">2</button><button data-v="3" aria-pressed="true">3</button><button data-v="4">4</button><button data-v="5">5</button>
+    </div>
+    <label>Intensity — defense, boards, sprinting back</label>
+    <div class="seg rate" id="bIntSeg">
+      <button data-v="1">1</button><button data-v="2">2</button><button data-v="3" aria-pressed="true">3</button><button data-v="4">4</button><button data-v="5">5</button>
+    </div>
+    <div class="grid2">
+      <div>
+        <label>Points</label>
+        <div class="step sm" data-step="b-pts">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-ptsVal">0<small>10 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Shots taken</label>
+        <div class="step sm" data-step="b-fga">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-fgaVal">0<small>5 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Free throws tried</label>
+        <div class="step sm" data-step="b-fta">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-ftaVal">0<small>5 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Free throws made</label>
+        <div class="step sm" data-step="b-ftm">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-ftmVal">0<small>FT %</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Rebounds</label>
+        <div class="step sm" data-step="b-reb">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-rebVal">0<small>10 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Assists</label>
+        <div class="step sm" data-step="b-ast">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-astVal">0<small>20 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Steals + blocks</label>
+        <div class="step sm" data-step="b-stl">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-stlVal">0<small>20 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+      <div>
+        <label>Hustle plays</label>
+        <div class="step sm" data-step="b-hustle">
+          <button type="button" data-d="-1" aria-label="One fewer">−</button>
+          <span class="val" id="b-hustleVal">0<small>50 XP</small></span>
+          <button type="button" data-d="1" aria-label="One more">+</button>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin:-4px 0 12px">Shots taken don't count free throws. Every shot and free throw earns XP, made or missed. Hustle plays: charges taken, dives on loose balls, called with Jayden.</p>
+    <div class="row">
+      <div>
+        <label for="bNote">One thing he did well</label>
+        <input id="bNote" type="text" placeholder="Optional">
+      </div>
+    </div>
+    <button class="btn" id="bSave">Save game</button>
+    <p class="note" id="bXpPreview"></p>
+  </div>
+
+  <div class="card">
+    <div class="rule"></div>
+    <h3>Game log</h3>
+    <div class="tape" id="bTape"></div>
   </div>
 </section>
 
@@ -645,6 +781,7 @@ function segVal(id){var b=$(id).querySelector('[aria-pressed="true"]');return b?
 var ACC={
   grades:{a:'var(--cougar)',i:'var(--cougar-ink)'},
   football:{a:'var(--cougar)',i:'var(--cougar-ink)'},
+  basketball:{a:'var(--cougar)',i:'var(--cougar-ink)'},
   soccer:{a:'var(--htx)',i:'var(--htx-ink)'},
   rewards:{a:'var(--chalk)',i:'var(--ink)'}
 };
@@ -774,6 +911,7 @@ document.addEventListener('click',function(e){
     payoutDollars=Math.max(0,payoutDollars + d*PAYOUT_BLOCK);
     drawPayout(); return;
   }
+  if(k.indexOf('b-')===0){ bStep(k.slice(2),d); return; }
   sCount[k]=Math.max(0,Math.min(20,sCount[k]+d));
   drawStep(k); sPreview();
 });
@@ -791,6 +929,53 @@ $('sSave').addEventListener('click',function(){
   [].forEach.call($('sClean').querySelectorAll('button'),function(b,i){b.setAttribute('aria-pressed',i===0?'true':'false')});
   sPreview();
   toast('+'+xp.toLocaleString()+' XP logged');
+});
+
+/* ---------- basketball ---------- */
+/* Shots and free throws earn XP made or missed, so he isn't afraid to shoot. Free throws made only
+   feed his percentage; those points are already in Points. */
+var B_XP={pts:10,fga:5,fta:5,ftm:0,reb:10,ast:20,stl:20,hustle:50};
+var B_KEYS=['pts','fga','fta','ftm','reb','ast','stl','hustle'];
+var B_LBL={pts:'10 XP',fga:'5 XP',fta:'5 XP',ftm:'FT %',reb:'10 XP',ast:'20 XP',stl:'20 XP',hustle:'50 XP'};
+var bCount={};
+function bReset(){ B_KEYS.forEach(function(k){bCount[k]=0}); }
+function bDraw(k){ $('b-'+k+'Val').innerHTML=bCount[k]+'<small>'+B_LBL[k]+'</small>'; }
+function bStep(k,d){
+  bCount[k]=Math.max(0,Math.min(60,bCount[k]+d));
+  if(k==='ftm' && bCount.ftm>bCount.fta){ bCount.fta=bCount.ftm; bDraw('fta'); }
+  if(k==='fta' && bCount.ftm>bCount.fta){ bCount.ftm=bCount.fta; bDraw('ftm'); }
+  bDraw(k); bPreview();
+}
+function bRating(){ return (parseInt(segVal('bEffortSeg'),10)+parseInt(segVal('bIntSeg'),10))*25; }
+function bStatXP(){ return B_KEYS.reduce(function(a,k){return a+bCount[k]*B_XP[k]},0); }
+function bPreview(){
+  var r=bRating(), st=bStatXP();
+  $('bXpPreview').textContent='Effort and intensity: '+r+' XP.'+(st?' Stats: '+st.toLocaleString()+' XP. Total '+(r+st).toLocaleString()+' XP.':' Rate it together after the game so he hears why.');
+}
+seg('bEffortSeg',bPreview); seg('bIntSeg',bPreview);
+$('bDate').value=today();
+bReset(); B_KEYS.forEach(bDraw); bPreview();
+$('bSave').addEventListener('click',function(){
+  var e={kind:'bball',opponent:$('bOpp').value.trim(),date:$('bDate').value||today(),
+    effort:parseInt(segVal('bEffortSeg'),10),intensity:parseInt(segVal('bIntSeg'),10),
+    note:$('bNote').value.trim(),xp:bRating()+bStatXP()};
+  B_KEYS.forEach(function(k){ e[k]=bCount[k]; });
+  add(e);
+  $('bOpp').value=''; $('bNote').value='';
+  bReset(); B_KEYS.forEach(bDraw); bPreview();
+  toast('+'+e.xp.toLocaleString()+' XP logged');
+});
+
+/* The basketball team is an entry (not synced meta like the football team), so it merges like everything else. */
+function bTeamEntries(){ return S.entries.filter(function(e){return e.kind==='bteam'}); }
+seg('bTeam',function(v){
+  var cur=bTeamEntries(), same=cur.length && cur[0].team===v;
+  cur.forEach(function(e){
+    var i=S.entries.indexOf(e); if(i>-1){ S.entries.splice(i,1); S.tombstones.push(e.id); }
+  });
+  if(same){ save(); queueSync(); toast('Team cleared'); return; }
+  add({kind:'bteam',team:v,date:today(),xp:teamXP(v)});
+  toast('+'+teamXP(v).toLocaleString()+' XP — '+v+' team');
 });
 
 /* ---------- training XP + rewards ---------- */
@@ -966,6 +1151,18 @@ function tapeRow(e){
     dot='var(--htx)';
     what='<b>Save bonus</b>';
     sub='Left the balance alone for '+SAVE_DAYS+' days';
+  } else if(e.kind==='bball'){
+    var bt=[e.pts+' pts'];
+    if(e.reb) bt.push(e.reb+' reb'); if(e.ast) bt.push(e.ast+' ast');
+    what='<b>'+(e.opponent||'Game')+'</b> · '+bt.join(' · ');
+    var bs=['E'+e.effort+' I'+e.intensity, e.fga+(e.fga===1?' shot':' shots')];
+    if(e.fta) bs.push(e.ftm+'/'+e.fta+' FT');
+    if(e.stl) bs.push(e.stl+(e.stl===1?' steal/block':' steals/blocks'));
+    if(e.hustle) bs.push(e.hustle+(e.hustle===1?' hustle play':' hustle plays'));
+    sub=bs.join(' · ')+(e.note?' · '+e.note:'');
+  } else if(e.kind==='bteam'){
+    what='<b>Basketball · '+e.team+' team</b>';
+    sub='Made the team';
   } else if(e.kind==='soccer'){
     dot='var(--htx)';
     var tally=[];
@@ -1051,6 +1248,18 @@ function render(){
   [].forEach.call($('fTeam').querySelectorAll('button'),function(b){b.setAttribute('aria-pressed',S.team===b.dataset.v?'true':'false')});
   $('teamSet').innerHTML = S.team ? '<p style="margin:0 0 12px"><span class="badge">'+S.team+' team</span> <span style="color:var(--chalk-dim);font-size:13px">+'+teamXP(S.team).toLocaleString()+' XP</span></p>' : '';
   paint($('fTape'), S.entries.filter(function(e){return e.kind==='kick'}), 'No kicks logged yet.');
+
+  var bg=S.entries.filter(function(e){return e.kind==='bball'});
+  var per=function(k){ return bg.length ? (bg.reduce(function(a,e){return a+(e[k]||0)},0)/bg.length).toFixed(1) : '—'; };
+  $('bPpg').textContent=per('pts'); $('bShots').textContent=per('fga'); $('bGames').textContent=bg.length;
+  $('bReb').textContent=per('reb'); $('bAst').textContent=per('ast');
+  var fta=bg.reduce(function(a,e){return a+(e.fta||0)},0), ftm=bg.reduce(function(a,e){return a+(e.ftm||0)},0);
+  $('bFt').textContent = fta ? Math.round(ftm/fta*100)+'%' : '—';
+  var bt=bTeamEntries()[0];
+  [].forEach.call($('bTeam').querySelectorAll('button'),function(b){b.setAttribute('aria-pressed',bt&&bt.team===b.dataset.v?'true':'false')});
+  $('bTeamSet').innerHTML = bt ? '<p style="margin:0 0 12px"><span class="badge">'+bt.team+' team</span> <span style="color:var(--chalk-dim);font-size:13px">+'+teamXP(bt.team).toLocaleString()+' XP</span></p>' : '<p style="margin:0 0 12px"><span class="badge" style="background:none;border:1px solid var(--chalk-dim);color:var(--chalk-dim)">Not announced yet</span></p>';
+  $('bTeamNote').textContent = bt ? 'Tap again to clear, or tap another team to switch.' : 'Tap his team when the roster is posted. One-time bonus: A 1,000 · B 750 · C 500 XP.';
+  paint($('bTape'), bg.slice().sort(function(a,b){return (b.date||'')<(a.date||'')?-1:1}), 'No games logged yet.');
 
   var sg=S.entries.filter(function(e){return e.kind==='soccer'});
   var avg=function(k){return sg.length?(sg.reduce(function(a,e){return a+e[k]},0)/sg.length).toFixed(1):'—'};
