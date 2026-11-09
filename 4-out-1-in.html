@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>4-Out 1-In Playbook</title>
+<meta name="description" content="Learn the 4-out 1-in offense: animated plays, a where-do-I-go quiz, and defensive reads.">
+<meta property="og:title" content="4-Out 1-In Playbook">
+<meta property="og:description" content="Animated plays, a where-do-I-go quiz, and defensive reads.">
+<meta name="apple-mobile-web-app-title" content="4-Out 1-In">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&display=swap">
+<style>
+/* Layout: the court is the hero (left, sticky); a coach's clipboard panel sits beside it and stacks under it on phones */
+:root{
+  --bg:#eceff3; --surface:#ffffff; --surface2:#f4f6f9; --ink:#141b27; --muted:#566273; --line:#d5dbe3;
+  --accent:#d4511a; --accent-text:#ad3a0b; --accent-ink:#ffffff; --you:#ffc21a; --good:#1d8549; --bad:#c2372c;
+  --wood:#e3bb83; --wood2:#dab077; --apron:#1b2a4a; --courtline:#fffaf0; --paint:#a3b8da;
+  --off:#f7f8fb; --offshorts:#14213d; --offring:#ffffff; --def:#c3282b; --defshorts:#7d1517; --trail:#141b27; --pass:#d4511a; --ballc:#ef7a22;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e131a; --surface:#161d27; --surface2:#1c2430; --ink:#edf1f6; --muted:#9ba7b7; --line:#2a3544;
+  --accent:#f2763a; --accent-text:#ff9a66; --accent-ink:#160b04; --you:#ffc93a; --good:#46c47b; --bad:#ff6d60;
+  --wood:#8a6239; --wood2:#815b34; --apron:#0a1222; --courtline:#f6ecda; --paint:#4a5f88;
+  --off:#f2f4f8; --offshorts:#1a2b55; --offring:#ffffff; --def:#e2453d; --defshorts:#86191a; --trail:#fff6e6; --pass:#ffb067; --ballc:#ff8a2e;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e131a; --surface:#161d27; --surface2:#1c2430; --ink:#edf1f6; --muted:#9ba7b7; --line:#2a3544;
+  --accent:#f2763a; --accent-text:#ff9a66; --accent-ink:#160b04; --you:#ffc93a; --good:#46c47b; --bad:#ff6d60;
+  --wood:#8a6239; --wood2:#815b34; --apron:#0a1222; --courtline:#f6ecda; --paint:#4a5f88;
+  --off:#f2f4f8; --offshorts:#1a2b55; --offring:#ffffff; --def:#e2453d; --defshorts:#86191a; --trail:#fff6e6; --pass:#ffb067; --ballc:#ff8a2e;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}img{max-width:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1220px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{padding-block:22px 14px}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 28px}
+.kicker{font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font:900 clamp(44px,7vw,72px)/.86 var(--display);letter-spacing:.01em;margin:8px 0 0;text-transform:uppercase}
+h1 em{font-style:normal;color:var(--accent-text)}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;overflow-x:auto;max-width:100%}
+.tab{border:0;background:none;padding:9px 14px;border-radius:9px;font-weight:600;font-size:15px;white-space:nowrap;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:24px;align-items:start;padding-block:6px 28px}
+.courtcol{position:sticky;top:12px;min-width:0}
+#court{display:block;width:100%;height:auto;border-radius:14px;background:var(--apron);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{width:30px;height:14px;overflow:visible}
+.panel{min-width:0;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.eyebrow{font:700 12px/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text)}
+h2{font:800 30px/1 var(--display);text-transform:uppercase;letter-spacing:.01em;margin:6px 0 10px;text-wrap:balance}
+.steptext{margin:0;font-size:17px;line-height:1.55;min-height:3.1em}
+.job{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--you) 22%,var(--surface));font-size:15px}
+.job b{font-weight:700}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:10px 14px;font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.dots{display:flex;gap:6px;margin-top:14px}
+.dots i{height:6px;flex:1;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.lessons{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px 7px 8px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.chip .n{font:800 13px/1 var(--display);width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"] .n{background:var(--accent);color:var(--accent-ink)}
+.label{font:700 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:10px;min-width:42px;padding:8px 11px;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--you);border-color:var(--you);color:#14213d}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.opts > div{min-width:0}
+
+/* quiz */
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.score div{background:var(--surface2);border-radius:10px;padding:10px 12px}
+.score b{display:block;font:800 30px/1 var(--display);font-variant-numeric:tabular-nums}
+.score span{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.qtext{font-size:17px;margin:0}
+.qask{font:800 24px/1.05 var(--display);text-transform:uppercase;margin:12px 0 0;color:var(--accent-text)}
+.fb{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:15px;border-left:4px solid}
+.fb.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.fb.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,var(--surface))}
+.fb b{display:block;font:800 20px/1.1 var(--display);text-transform:uppercase;margin-bottom:3px}
+.choices{display:grid;gap:8px;margin-top:14px}
+.choice{text-align:left;border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:12px 14px;font-weight:600;font-size:16px}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 16%,var(--surface))}
+.choice.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.choice:disabled{cursor:default}
+.hint{font-size:14px;color:var(--muted);margin:10px 0 0}
+
+/* rules */
+.rules{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:r}
+.rules li{counter-increment:r;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.rules li:first-child{border-top:0}
+.rules li::before{content:counter(r);font:900 26px/1 var(--display);color:var(--accent-text)}
+.rules b{display:block;font-weight:700}
+.rules p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.rules .btn{padding:6px 10px;font-size:13px}
+
+footer{padding-block:6px 30px;color:var(--muted);font-size:13px}
+footer a{color:inherit}
+
+/* svg pieces */
+.badge text,.tagg text,.ringlab,.ovtxt{font-family:var(--display);font-weight:800}
+.fig{pointer-events:none}
+.ring{cursor:pointer}
+.ring circle{fill:color-mix(in srgb,var(--accent) 16%,transparent);stroke:var(--accent);stroke-width:.2;stroke-dasharray:.6 .4}
+.ring:hover circle{fill:color-mix(in srgb,var(--accent) 34%,transparent)}
+.ringlab{font-size:1.05px;fill:var(--trail);letter-spacing:.06px;pointer-events:none}
+@media (prefers-reduced-motion: no-preference){.ring circle{animation:pulse 1.4s ease-in-out infinite}}
+@keyframes pulse{50%{stroke-width:.34}}
+@media (max-width:900px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .courtcol{position:static}
+  .lessons{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+}
+@media (max-width:480px){.opts{grid-template-columns:1fr} h2{font-size:26px}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.tab{padding:9px 8px}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="kicker">Team playbook · 7th grade</div>
+      <h1>4 Out <em>1 In</em></h1>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="t-learn" data-tab="learn" aria-selected="true">Learn it</button>
+      <button class="tab" role="tab" id="t-quiz" data-tab="quiz" aria-selected="false">Where do I go?</button>
+      <button class="tab" role="tab" id="t-reads" data-tab="reads" aria-selected="false">Read the D</button>
+      <button class="tab" role="tab" id="t-rules" data-tab="rules" aria-selected="false">The rules</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap stage">
+  <section class="courtcol" aria-label="Court">
+    <svg id="court" viewBox="-1.6 -1.6 53.2 35.4" role="img" aria-label="Half court diagram with players"></svg>
+    <div class="legend" aria-hidden="true">
+      <span><svg viewBox="0 0 14 14" style="width:14px"><circle cx="7" cy="2.4" r="2" fill="#8d5524"/><rect x="4.4" y="4.5" width="5.2" height="5" rx="1" fill="var(--off)" stroke="var(--offshorts)" stroke-width=".8"/><path d="M5.4 9.5V13.5M8.6 9.5V13.5" stroke="var(--offshorts)" stroke-width="1.8" stroke-linecap="round"/></svg>Offense</span>
+      <span><svg viewBox="0 0 14 14" style="width:14px"><circle cx="7" cy="2.4" r="2" fill="#c68642"/><rect x="4.4" y="4.5" width="5.2" height="5" rx="1" fill="var(--def)"/><path d="M5.4 9.5L3.5 13.5M8.6 9.5L10.5 13.5" stroke="var(--def)" stroke-width="1.8" stroke-linecap="round"/></svg>Defense</span>
+      <span><svg viewBox="0 0 14 14" style="width:14px"><ellipse cx="7" cy="12" rx="6" ry="2" fill="none" stroke="var(--you)" stroke-width="1.4"/><rect x="4.4" y="3" width="5.2" height="6" rx="1" fill="var(--you)"/></svg>You</span>
+      <span><svg viewBox="0 0 30 14"><path d="M1 7H24" stroke="var(--ink)" stroke-width="2"/><path d="M22 3L28 7L22 11Z" fill="var(--ink)"/></svg>Cut / move</span>
+      <span><svg viewBox="0 0 30 14"><path d="M1 7H24" stroke="var(--pass)" stroke-width="2" stroke-dasharray="4 3"/><path d="M22 3L28 7L22 11Z" fill="var(--pass)"/></svg>Pass</span>
+      <span><svg viewBox="0 0 30 14"><path d="M1 7L4 3L8 11L12 3L16 11L20 7H24" stroke="var(--ink)" stroke-width="1.8" fill="none"/><path d="M22 3L28 7L22 11Z" fill="var(--ink)"/></svg>Dribble</span>
+      <span><svg viewBox="0 0 30 14"><path d="M1 7H25M25 1V13" stroke="var(--ink)" stroke-width="2"/></svg>Screen</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <!-- LEARN -->
+    <div id="p-learn" class="panel">
+      <div class="lessons" id="lessonChips" aria-label="Lessons"></div>
+      <div class="card">
+        <div class="eyebrow" id="lsEyebrow">Lesson 1 · Step 1 of 4</div>
+        <h2 id="lsTitle">The spots</h2>
+        <p class="steptext" id="lsText"></p>
+        <p class="job" id="lsJob" hidden></p>
+        <div class="controls">
+          <button class="btn" id="bPrev" aria-label="Previous step">◀ Back</button>
+          <button class="btn primary" id="bPlay">▶ Play step</button>
+          <button class="btn" id="bNext">Next ▶</button>
+          <button class="btn" id="bAll">Run whole play</button>
+        </div>
+        <div class="dots" id="lsDots"></div>
+      </div>
+      <div class="card opts">
+        <div>
+          <div class="label">Follow a player</div>
+          <div class="seg" id="followSeg"></div>
+        </div>
+        <div>
+          <div class="label">Speed</div>
+          <div class="seg" id="speedSeg">
+            <button data-speed="0.55" aria-pressed="false">Slow</button>
+            <button data-speed="1" aria-pressed="true">Game speed</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="p-quiz" class="panel" hidden>
+      <div class="card">
+        <div class="score">
+          <div><b id="qRight">0</b><span>Correct</span></div>
+          <div><b id="qStreak">0</b><span>Streak</span></div>
+          <div><b id="qBest">0</b><span>Best streak</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="eyebrow" id="qType">Wing pass</div>
+        <p class="qtext" id="qText" style="margin-top:8px"></p>
+        <p class="qask" id="qAsk"></p>
+        <p class="hint" id="qHint">Tap a circle on the court.</p>
+        <div class="fb" id="qFb" aria-live="polite" hidden></div>
+        <div class="controls">
+          <button class="btn" id="qReplay">↺ Replay</button>
+          <button class="btn primary" id="qNext">Next play ▶</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">Practice as</div>
+        <div class="seg" id="roleSeg">
+          <button data-role="any" aria-pressed="true">Any spot</button>
+          <button data-role="slot" aria-pressed="false">Slot</button>
+          <button data-role="wing" aria-pressed="false">Wing</button>
+          <button data-role="post" aria-pressed="false">Post</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- READS -->
+    <div id="p-reads" class="panel" hidden>
+      <div class="card">
+        <div class="eyebrow" id="rCount">Read 1 of 9</div>
+        <h2 id="rTitle"></h2>
+        <p class="qtext" id="rText"></p>
+        <div class="choices" id="rChoices"></div>
+        <div class="fb" id="rFb" aria-live="polite" hidden></div>
+        <div class="controls">
+          <button class="btn" id="rReplay">↺ Replay</button>
+          <button class="btn primary" id="rNext">Next read ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RULES -->
+    <div id="p-rules" class="panel" hidden>
+      <div class="card">
+        <div class="eyebrow">Know these cold</div>
+        <h2>The 4-out 1-in rules</h2>
+        <ol class="rules" id="rulesList"></ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">Built from Coach Josh's video <a href="https://www.youtube.com/watch?v=z7qquK4djos" target="_blank" rel="noopener">Easy Basketball Offense: How to Run 4 Out 1 In</a>. Keyboard: ← → steps, space plays.</footer>
+
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs={},parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;};
+const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+const lerp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+const unit=(a,b)=>{const d=dist(a,b)||1;return[(b[0]-a[0])/d,(b[1]-a[1])/d];};
+const add=(a,v,k=1)=>[a[0]+v[0]*k,a[1]+v[1]*k];
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const f2=n=>n.toFixed(2);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+/* ---------- court geometry (feet; basket at top) ---------- */
+const BASKET=[25,5.25];
+const SP={SL:[17.5,26.5],SR:[32.5,26.5],WL:[7.5,18.5],WR:[42.5,18.5],BL:[18.2,8],BR:[31.8,8],RIM:[25,7.9],CL:[2.8,3.4],CR:[47.2,3.4],HP:[25,17.8]};
+const SPOT_NAME={SL:'left slot',SR:'right slot',WL:'left wing',WR:'right wing',BL:'left block',BR:'right block',RIM:'the rim',CL:'left corner',CR:'right corner',HP:'high post'};
+const RING_LABEL={SL:'SLOT',SR:'SLOT',WL:'WING',WR:'WING',BL:'BLOCK',BR:'BLOCK',RIM:'RIM',CL:'CORNER',CR:'CORNER',HP:'HIGH POST'};
+const R=v=>typeof v==='string'?SP[v].slice():[v[0],v[1]];
+const SPEED={cut:10.5,fill:9.5,blast:12.5,vcut:10,drib:8.5,screen:8};
+const KIND_JOB={cut:'Cut',fill:'Fill the open spot',blast:'Blast cut',vcut:'V cut',drib:'Dribble',screen:'Set a screen'};
+
+function mkPoly(pts){const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+dist(pts[i-1],pts[i]));return{pts,cum,len:cum[cum.length-1]};}
+function at(poly,f){if(poly.len===0)return poly.pts[0].slice();const L=clamp(f)*poly.len,c=poly.cum;let i=1;while(i<c.length-1&&c[i]<L)i++;const seg=(c[i]-c[i-1])||1;return lerp(poly.pts[i-1],poly.pts[i],clamp((L-c[i-1])/seg));}
+function trim(poly,a,b){if(poly.len<a+b+0.6){const k=poly.len/(a+b+0.6);a*=k;b*=k;}const L0=a,L1=poly.len-b;const out=[at(poly,L0/poly.len)];for(let i=0;i<poly.pts.length;i++)if(poly.cum[i]>L0&&poly.cum[i]<L1)out.push(poly.pts[i]);out.push(at(poly,L1/poly.len));return out;}
+function crPt(p0,p1,p2,p3,t){const t2=t*t,t3=t2*t;return[0,1].map(i=>.5*(2*p1[i]+(-p0[i]+p2[i])*t+(2*p0[i]-5*p1[i]+4*p2[i]-p3[i])*t2+(-p0[i]+3*p1[i]-3*p2[i]+p3[i])*t3));}
+function sample(pts,sharp){
+  const out=[pts[0]];
+  if(sharp||pts.length===2){for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],n=Math.max(2,Math.ceil(dist(a,b)/.5));for(let k=1;k<=n;k++)out.push(lerp(a,b,k/n));}return out;}
+  for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||pts[i+1];const n=Math.max(6,Math.ceil(dist(p1,p2)/.4));for(let k=1;k<=n;k++)out.push(crPt(p0,p1,p2,p3,k/n));}
+  return out;
+}
+function zig(pts){const poly=mkPoly(pts);const out=[pts[0]];let side=1;for(let L=.8;L<poly.len-1.3;L+=.8){const p=at(poly,L/poly.len),q=at(poly,(L+.1)/poly.len);const u=unit(p,q);out.push([p[0]-u[1]*.55*side,p[1]+u[0]*.55*side]);side=-side;}out.push(pts[pts.length-1]);return out;}
+const dstr=pts=>'M'+pts.map(p=>f2(p[0])+','+f2(p[1])).join('L');
+const clonePos=o=>{const r={};for(const k in o)r[k]=o[k].slice();return r;};
+
+/* ---------- compile a play into timed beats ---------- */
+function compile(prog){
+  const st={pos:{},ball:prog.start.ball??null,ballAt:null,dm:{},hold:{...(prog.start.hold||{})}};
+  for(const p in prog.start.pos)st.pos[p]=R(prog.start.pos[p]);
+  const defOn=!!prog.start.def;
+  if(defOn)for(const p in st.pos)st.dm[p]=prog.start.def[p]||'on';
+  const steps=prog.steps.map(s=>{
+    let beats=s.a||[];if(beats.length&&!Array.isArray(beats[0]))beats=[beats];if(!beats.length)beats=[[]];
+    const snap={pos:clonePos(st.pos),ball:st.ball};
+    const cb=beats.map(actions=>{
+      const b={startPos:clonePos(st.pos),startBall:st.ball,startBallAt:st.ballAt,tracks:[],tags:[],hold:{...st.hold},poseNew:{}};
+      for(const a of actions)if(a.pose){b.hold[a.pose]=a.name;b.poseNew[a.pose]=1;}
+      for(const a of actions)if(a.d)st.dm[a.d]=a.mode==='at'?{at:R(a.at)}:a.mode;
+      b.dm={...st.dm};
+      const end=clonePos(st.pos);
+      for(const a of actions)if(a.m){const p=a.m,k=a.k||'cut';const pts=[st.pos[p],...a.v.map(R)];const poly=mkPoly(sample(pts,a.s));
+        b.tracks.push({type:'move',p,poly,k,l:a.l||'',q:!!a.q,delay:a.delay||0,dur:Math.max(.6,poly.len/SPEED[k])});end[p]=pts[pts.length-1].slice();st.hold[p]=k==='screen'?'screen':null;}
+      for(const a of actions)if(a.pass){const[x,y]=a.pass;const from=st.pos[x].slice(),to=end[y].slice();const dur=.45+dist(from,to)/55;let delay=a.delay||0;
+        if(a.lead){const rt=b.tracks.find(t=>t.type==='move'&&t.p==y);if(rt)delay=Math.max(0,rt.delay+rt.dur-dur);}
+        b.tracks.push({type:'pass',a:x,b:y,from,to,delay,dur});st.ball=y;st.ballAt=null;st.hold[x]=null;}
+      for(const a of actions)if(a.shot){const p=a.shot;b.tracks.push({type:'shot',p,from:end[p].slice(),delay:a.delay||0,dur:1.05});st.ball=null;st.ballAt=[25,6.7];st.hold[p]='celebrate';}
+      for(const a of actions)if(a.tag)b.tags.push({p:a.tag,l:a.l});
+      for(const a of actions)if(a.pose)st.hold[a.pose]=a.name;
+      let dur=.35;for(const t of b.tracks)dur=Math.max(dur,t.delay+t.dur+(t.type==='shot'?.55:0));for(const a of actions)if(a.wait)dur=Math.max(dur,a.wait);
+      b.dur=dur+.2;st.pos=end;return b;
+    });
+    return{t:s.t||'',x:s.x||'',ov:s.ov,beats:cb,snap};
+  });
+  return{steps,defOn,title:prog.title||''};
+}
+
+
+/* ---------- animated players (side-view figures standing on the top-down court) ---------- */
+const LIMB={t:.8,s:.8,u:.62,f:.6,torso:1.25};
+const SC=1.4; /* figures are drawn a bit larger than true scale so kids can read the poses */
+const POSES={
+  ready:{lean:.1,tB:-.25,sB:-.55,tF:.35,sF:-.05,uB:.35,fB:1.25,uF:.55,fF:1.55},
+  triple:{lean:.22,tB:-.45,sB:-.8,tF:.55,sF:-.05,uB:.3,fB:1.35,uF:.35,fF:1.5},
+  jumpstop:{lean:.12,tB:-.6,sB:-1.0,tF:.6,sF:-.2,uB:.95,fB:2.1,uF:.9,fF:2.15},
+  pass:{lean:.22,tB:-.4,sB:-.6,tF:.6,sF:.1,uB:1.45,fB:1.55,uF:1.45,fF:1.6},
+  catch:{lean:.08,tB:-.2,sB:-.45,tF:.3,sF:0,uB:1.55,fB:1.9,uF:1.6,fF:1.95},
+  shoot:{lean:0,tB:-.08,sB:-.3,tF:.05,sF:-.2,uB:2.55,fB:2.95,uF:2.7,fF:3.05},
+  celebrate:{lean:0,tB:-.15,sB:-.3,tF:.15,sF:-.1,uB:2.8,fB:2.95,uF:2.85,fF:3.0},
+  screen:{lean:-.03,tB:-.35,sB:-.12,tF:.35,sF:.12,uB:.45,fB:2.4,uF:.4,fF:2.5},
+  handsup:{lean:.05,tB:-.25,sB:-.5,tF:.3,sF:-.05,uB:.4,fB:1.3,uF:2.75,fF:2.95},
+  def:{lean:.28,tB:-.7,sB:-.25,tF:.7,sF:.25,uB:-1.0,fB:-.75,uF:1.2,fF:1.35},
+  deny:{lean:.25,tB:-.65,sB:-.2,tF:.65,sF:.2,uB:-.7,fB:-.5,uF:1.55,fF:1.55},
+};
+for(const k in POSES)POSES[k].hop=0;
+function runPose(ph,drib){
+  const s=Math.sin(ph),c=Math.cos(ph),tB=.62*s,tF=-.62*s;
+  const r={lean:drib?.18:.24,tB,tF,sB:tB-.2-Math.max(0,c),sF:tF-.2-Math.max(0,-c),uB:-.75*s,uF:.75*s,fB:-.75*s+1.5,fF:.75*s+1.5,hop:.13*Math.abs(c)};
+  if(drib){r.uF=.55;r.fF=.35;r.uB=1.05;r.fB=1.75;}
+  return r;
+}
+function shufflePose(ph){const s=Math.sin(ph),b=POSES.def;return{...b,tB:b.tB-.2*s,tF:b.tF+.2*s,hop:.1*Math.abs(Math.cos(ph))};}
+const SKIN=['#8d5524','#c68642','#5c3a1e','#e0ac69','#a8693c'];
+class Fig{
+  constructor(layer,shLayer,num,team){
+    this.team=team;this.num=num;const skin=SKIN[(num*2+(team==='d'?1:0))%SKIN.length];
+    this.sh=el('ellipse',{rx:.95*SC,ry:.32*SC,fill:'#000',opacity:.22},shLayer);
+    this.ring=el('ellipse',{rx:1.3*SC,ry:.5*SC,fill:'none',stroke:'var(--you)','stroke-width':.24,opacity:0},shLayer);
+    const g=this.g=el('g',{class:'fig'},layer);
+    const P=(c,w)=>el('path',{fill:'none',stroke:c,'stroke-width':w*SC,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+    this.armB=P(skin,.22);this.thB=P('',.42);this.shB=P(skin,.27);this.shoeB=P('#1d1d22',.27);
+    this.torso=el('path',{'stroke-width':.16*SC,'stroke-linejoin':'round'},g);
+    this.thF=P('',.42);this.shF=P(skin,.27);this.shoeF=P('#1d1d22',.27);
+    this.hair=el('circle',{r:.37*SC,fill:'#1b120c'},g);this.head=el('circle',{r:.36*SC,fill:skin},g);this.eye=el('circle',{r:.055*SC,fill:'#1b120c'},g);
+    this.numt=el('text',{'text-anchor':'middle','dominant-baseline':'central','font-size':.62*SC,'font-family':'var(--display)','font-weight':800},g);this.numt.textContent=num;
+    this.armF=P(skin,.22);
+    this.pose={...POSES.ready};this.fc=1;this.ft=1;this.ph=Math.random()*6;this.prev=null;this.y=0;this.setYou(false);
+  }
+  setYou(on){
+    const o=this.team==='o';const jersey=on?'var(--you)':o?'var(--off)':'var(--def)';const trim=o?'var(--offshorts)':'var(--defshorts)';
+    this.torso.setAttribute('fill',jersey);this.torso.setAttribute('stroke',trim);this.thB.setAttribute('stroke',trim);this.thF.setAttribute('stroke',trim);
+    this.numt.setAttribute('fill',o?'var(--offshorts)':'#fff');this.ring.setAttribute('opacity',on?1:0);
+  }
+  update(pos,target,face,dt,snap,hop){
+    const k=snap?1:1-Math.exp(-dt*16);const p=this.pose;
+    for(const key in target)p[key]+=(target[key]-p[key])*k;
+    if(face)this.ft=face;this.fc+=(this.ft-this.fc)*(snap?1:1-Math.exp(-dt*11));
+    const f=this.fc,L=LIMB;
+    const leg=(t,s)=>{const kn=[Math.sin(t)*L.t,Math.cos(t)*L.t];return[kn,[kn[0]+Math.sin(s)*L.s,kn[1]+Math.cos(s)*L.s]];};
+    const[kB,fB]=leg(p.tB,p.sB),[kF,fF]=leg(p.tF,p.sF);
+    const hipY=-Math.max(fB[1],fF[1])-p.hop-hop;
+    const W=v=>[pos[0]+v[0]*f*SC,pos[1]+v[1]*SC];const D=a=>dstr(a.map(W));
+    const H=[0,hipY],dir=[Math.sin(p.lean),-Math.cos(p.lean)];
+    const S=add(H,dir,L.torso),C=add(S,dir,.5);
+    const arm=(u,fo)=>{const e=add(S,[Math.sin(u),Math.cos(u)],L.u);return[e,add(e,[Math.sin(fo),Math.cos(fo)],L.f)];};
+    const[eB,hB]=arm(p.uB,p.fB),[eF,hF]=arm(p.uF,p.fF);
+    const lg=v=>[v[0],v[1]+hipY];
+    this.thB.setAttribute('d',D([H,lg(kB)]));this.shB.setAttribute('d',D([lg(kB),lg(fB)]));this.shoeB.setAttribute('d',D([lg(fB),add(lg(fB),[.3,0])]));
+    this.thF.setAttribute('d',D([H,lg(kF)]));this.shF.setAttribute('d',D([lg(kF),lg(fF)]));this.shoeF.setAttribute('d',D([lg(fF),add(lg(fF),[.3,0])]));
+    this.torso.setAttribute('d',D([add(H,[-.3,.08]),add(H,[.3,.08]),add(S,[.32,0]),add(S,[-.3,0])])+'Z');
+    this.armB.setAttribute('d',D([S,eB,hB]));this.armF.setAttribute('d',D([S,eF,hF]));
+    const c=W(C),hc=W(add(C,[-.06,-.07])),ey=W(add(C,[.2,-.03]));
+    this.head.setAttribute('cx',f2(c[0]));this.head.setAttribute('cy',f2(c[1]));this.hair.setAttribute('cx',f2(hc[0]));this.hair.setAttribute('cy',f2(hc[1]));
+    this.eye.setAttribute('cx',f2(ey[0]));this.eye.setAttribute('cy',f2(ey[1]));
+    const m=W(lerp(H,S,.55)),sx=Math.max(.25,Math.abs(f));
+    this.numt.setAttribute('x',f2(m[0]));this.numt.setAttribute('y',f2(m[1]));this.numt.setAttribute('transform',`matrix(${f2(sx)},0,0,1,${f2(m[0]*(1-sx))},0)`);
+    for(const e of[this.sh,this.ring]){e.setAttribute('cx',f2(pos[0]));e.setAttribute('cy',f2(pos[1]));}
+    this.sh.setAttribute('rx',f2(SC*(.95-Math.min(.35,(p.hop+hop)*.3))));
+    this.y=pos[1];
+    return{handF:W(hF),handB:W(hB),f,pos};
+  }
+}
+
+/* ---------- the court ---------- */
+class Court{
+  constructor(svg){
+    this.svg=svg;this.speed=1;this.follow=null;this.preview=true;this.playing=false;this.pauseLeft=0;
+    this.tick=this.tick.bind(this);this.drawCourt();
+    this.gOv=el('g',{},svg);this.gTrail=el('g',{},svg);this.gRing=el('g',{},svg);this.gMark=el('g',{},svg);this.gShadow=el('g',{},svg);this.gFig=el('g',{},svg);this.gBall=el('g',{},svg);this.gTag=el('g',{},svg);this.gFx=el('g',{},svg);
+    this.bshadow=el('ellipse',{rx:.4,ry:.16,fill:'#000',opacity:.25},this.gShadow);
+    this.ball=el('g',{},this.gBall);el('circle',{r:.42,fill:'var(--ballc)',stroke:'#3a1a05','stroke-width':.07},this.ball);
+    el('path',{d:'M-.42 0H.42M0 -.42V.42M-.3 -.3Q0 0 -.3 .3M.3 -.3Q0 0 .3 .3',stroke:'#3a1a05','stroke-width':.05,fill:'none'},this.ball);
+    this.flash=el('circle',{cx:25,cy:5.25,r:1,fill:'none',stroke:'var(--you)','stroke-width':.35,opacity:0},this.gFx);
+    this.figs={};this.dfigs={};this.dpos={};this.clock=0;
+  }
+  drawCourt(){
+    const s=this.svg,L={stroke:'var(--courtline)','stroke-width':.18,fill:'none'};
+    const defs=el('defs',{},s);
+    const pat=el('pattern',{id:'boards',width:3,height:40,patternUnits:'userSpaceOnUse'},defs);
+    el('rect',{width:1.5,height:40,fill:'var(--wood)'},pat);el('rect',{x:1.5,width:1.5,height:40,fill:'var(--wood2)'},pat);
+    const mk=(id,color,tee)=>{const m=el('marker',{id,viewBox:'-1 -5 10 10',refX:tee?1:4,refY:0,markerWidth:4.2,markerHeight:4.2,orient:'auto',markerUnits:'strokeWidth'},defs);
+      if(tee)el('path',{d:'M1 -4.5V4.5',stroke:color,'stroke-width':2.2,fill:'none'},m);else el('path',{d:'M0 -3.6L8 0L0 3.6Z',fill:color},m);};
+    mk('arr','var(--trail)');mk('arrY','var(--trail)');mk('arrP','var(--pass)');mk('tee','var(--trail)',true);
+    el('rect',{x:-1.6,y:-1.6,width:53.2,height:35.4,fill:'var(--apron)'},s);
+    el('rect',{x:0,y:0,width:50,height:34,fill:'url(#boards)'},s);
+    el('rect',{x:19,y:0,width:12,height:19,fill:'var(--paint)'},s);
+    el('rect',{x:0,y:0,width:50,height:40,...L},s);
+    el('rect',{x:19,y:0,width:12,height:19,...L},s);
+    el('path',{d:'M19 19A6 6 0 0 0 31 19',...L},s);
+    el('path',{d:'M19 19A6 6 0 0 1 31 19',...L,'stroke-dasharray':'.9 .7'},s);
+    el('path',{d:'M5.25 0V5.25A19.75 19.75 0 0 0 44.75 5.25V0',...L},s);
+    el('path',{d:'M21 5.25A4 4 0 0 0 29 5.25',...L},s);
+    for(const y of[7,8,11,14])for(const x of[18.4,31])el('rect',{x,y,width:.6,height:y===7?1:.18,fill:'var(--courtline)'},s);
+    el('line',{x1:22,y1:4,x2:28,y2:4,stroke:'var(--courtline)','stroke-width':.32},s);
+    el('line',{x1:25,y1:4,x2:25,y2:4.5,stroke:'var(--ballc)','stroke-width':.2},s);
+    el('circle',{cx:25,cy:5.25,r:.75,fill:'none',stroke:'var(--ballc)','stroke-width':.22},s);
+  }
+  load(prog,opts={}){
+    this.stop();this.c=compile(prog);this.preview=opts.preview!==false;
+    this.gFig.innerHTML='';[...this.gShadow.querySelectorAll('ellipse')].forEach(e=>{if(e!==this.bshadow)e.remove();});
+    this.figs={};this.dfigs={};this.dpos={};
+    const ps=Object.keys(this.c.steps[0].snap.pos);
+    for(const p of ps){
+      if(this.c.defOn)this.dfigs[p]=new Fig(this.gFig,this.gShadow,+p,'d');
+      this.figs[p]=new Fig(this.gFig,this.gShadow,+p,'o');
+    }
+    this.si=0;this.bi=0;this.t=0;this.snap=true;
+    this.setFollow(this.follow);this.clearMarks();this.setRings(null);
+    this.goto(opts.step||0);
+  }
+  setFollow(p){this.follow=p;for(const k in this.figs)this.figs[k].setYou(String(k)===String(p));
+    if(this.c)this.buildTrails();if(this.c&&!this.playing)this.render(0);}
+  goto(i){this.stop();this.si=clamp(i,0,this.c.steps.length-1);this.bi=0;this.t=0;this.snap=true;this.buildTrails();this.buildOverlay();this.render(0);this.onStep&&this.onStep(this.si);}
+  toEnd(i){this.goto(i);const st=this.c.steps[this.si];this.bi=st.beats.length-1;this.t=st.beats[this.bi].dur;this.snap=true;this.render(0);}
+  play(i,o={}){
+    if(i!=null)this.goto(i);else{this.bi=0;this.t=0;this.snap=true;}
+    this.until=o.all?this.c.steps.length-1:(o.until??this.si);this.done=o.done||null;this.playing=true;this.pauseLeft=0;this.last=performance.now();
+    this.onPlay&&this.onPlay(true);requestAnimationFrame(this.tick);
+  }
+  resume(){if(this.playing)return;this.playing=true;this.last=performance.now();this.onPlay&&this.onPlay(true);requestAnimationFrame(this.tick);}
+  pause(){if(!this.playing)return;this.playing=false;this.onPlay&&this.onPlay(false);}
+  stop(){this.playing=false;this.done=null;}
+  atEnd(){const st=this.c.steps[this.si];return this.bi===st.beats.length-1&&this.t>=st.beats[this.bi].dur;}
+  tick(now){
+    if(!this.playing)return;
+    const dt=Math.min(.05,(now-this.last)/1000)*this.speed;this.last=now;
+    if(this.pauseLeft>0){this.pauseLeft-=dt;if(this.pauseLeft<=0){this.si++;this.bi=0;this.t=0;this.buildTrails();this.buildOverlay();this.onStep&&this.onStep(this.si);}}
+    else{
+      const st=this.c.steps[this.si];const bt=st.beats[this.bi];this.t+=dt;
+      if(this.t>=bt.dur){
+        if(this.bi<st.beats.length-1){this.bi++;this.t=0;}
+        else{this.t=bt.dur;if(this.si<this.until){this.pauseLeft=.7;}
+          else{this.playing=false;this.render(dt);this.onPlay&&this.onPlay(false);const d=this.done;this.done=null;d&&d();return;}}
+      }
+    }
+    this.render(dt);requestAnimationFrame(this.tick);
+  }
+  buildTrails(){
+    this.gTrail.innerHTML='';const st=this.c.steps[this.si];
+    st.beats.forEach(b=>b.tracks.forEach(t=>{
+      t.base=t.prog=null;
+      if(t.type==='move'&&!t.q){
+        const mine=String(t.p)===String(this.follow);const w=mine?.42:.26;
+        let pts=trim(t.poly,1.5,1.7);if(t.k==='drib')pts=zig(pts);const d=dstr(pts);
+        const g=el('g',{},this.gTrail);
+        if(mine)el('path',{d,stroke:'var(--you)','stroke-width':w+.5,fill:'none','stroke-linejoin':'round','stroke-linecap':'round',opacity:.85},g);
+        t.base=el('path',{d,stroke:'var(--trail)','stroke-width':w,fill:'none','stroke-linejoin':'round','marker-end':t.k==='screen'?'url(#tee)':'url(#arr)'},g);
+        t.prog=el('path',{d,stroke:'var(--trail)','stroke-width':w,fill:'none','stroke-linejoin':'round',pathLength:1,'stroke-dasharray':'1 1'},g);
+        t.g=g;
+      }else if(t.type==='pass'){
+        const poly=mkPoly([t.from,t.to]);const pts=trim(poly,1.6,1.9);
+        t.base=el('path',{d:dstr(pts),stroke:'var(--pass)','stroke-width':.26,'stroke-dasharray':'.7 .45',fill:'none','marker-end':'url(#arrP)'},this.gTrail);t.g=t.base;
+      }
+    }));
+  }
+  buildOverlay(){
+    this.gOv.innerHTML='';const st=this.c.steps[this.si];if(!st.ov)return;const pos=st.snap.pos;const g=this.gOv;
+    const pill=(x,y,txt,opt={})=>{const gg=el('g',{class:'badge'},g);const w=txt.length*.62+1.2;el('rect',{x:x-w/2,y:y-.75,width:w,height:1.5,rx:.75,fill:opt.fill||'var(--apron)',opacity:.92},gg);
+      const t=el('text',{x,y:y+.04,'text-anchor':'middle','dominant-baseline':'central','font-size':1.02,fill:opt.color||'var(--courtline)','letter-spacing':.06},gg);t.textContent=txt;};
+    if(st.ov==='spots'){
+      pill(SP.SL[0],SP.SL[1]+3.1,'SLOT');pill(SP.SR[0],SP.SR[1]+3.1,'SLOT');pill(SP.WL[0],SP.WL[1]+3.1,'WING');pill(SP.WR[0],SP.WR[1]+3.1,'WING');
+      const post=Object.keys(pos).find(p=>dist(pos[p],SP.BL)<1.5||dist(pos[p],SP.BR)<1.5);
+      if(post)pill(pos[post][0],pos[post][1]+2.9,'POST');
+    }
+    if(st.ov==='spacing'){
+      for(const[a,b]of[['SL','SR'],['WL','SL'],['SR','WR']]){const A=SP[a],B=SP[b];const pts=trim(mkPoly([A,B]),1.8,1.8);
+        el('path',{d:dstr(pts),stroke:'var(--you)','stroke-width':.3,'stroke-dasharray':'.5 .35'},g);const m=lerp(A,B,.5);pill(m[0],m[1]+(a==='SL'&&b==='SR'?1.6:-1.4),Math.round(dist(A,B))+' FT',{fill:'var(--you)',color:'#14213d'});}
+    }
+    if(st.ov==='lanes'){
+      for(const[a,b]of[['WL','SL'],['SL','SR'],['SR','WR']]){const m=lerp(SP[a],SP[b],.5);const tgt=[25+(m[0]-25)*.18,9.5];
+        el('line',{x1:m[0],y1:m[1],x2:tgt[0],y2:tgt[1],stroke:'var(--you)','stroke-width':3.4,'stroke-linecap':'round',opacity:.34},g);}
+      pill(25,14.2,'DRIVING LANES',{fill:'var(--you)',color:'#14213d'});
+    }
+    if(st.ov==='spd'){
+      const h=st.snap.ball;const P=pos[h];
+      const ctrl=[(P[0]+25)/2,Math.min(P[1],5.25)-1];
+      el('path',{d:`M${f2(P[0])},${f2(P[1])}Q${f2(ctrl[0])},${f2(ctrl[1])} 25,5.6`,stroke:'var(--you)','stroke-width':.32,'stroke-dasharray':'.25 .45','stroke-linecap':'round',fill:'none'},g);
+      let near=null,nd=1e9;for(const p in pos)if(p!=h&&dist(pos[p],P)<nd&&dist(pos[p],SP.BL)>2&&dist(pos[p],SP.BR)>2){nd=dist(pos[p],P);near=p;}
+      if(near){const pts=trim(mkPoly([P,pos[near]]),1.7,2);el('path',{d:dstr(pts),stroke:'var(--pass)','stroke-width':.26,'stroke-dasharray':'.7 .45',fill:'none','marker-end':'url(#arrP)'},g);}
+      const dv=[P[0]+(25-P[0])*.42,P[1]-(P[1]-10)*.42];el('path',{d:dstr(zig(trim(mkPoly([P,dv]),1.6,.4))),stroke:'var(--trail)','stroke-width':.26,fill:'none','marker-end':'url(#arr)'},g);
+      const sx=(P[0]+25)/2,sy=(P[1]+5.25)/2-2.2;pill(sx,sy,'1 SHOOT',{fill:'var(--you)',color:'#14213d'});
+      if(near){const m=lerp(P,pos[near],.5);pill(m[0],m[1]-1.3,'2 PASS');}
+      pill(dv[0]+1.8,dv[1]+1.8,'3 DRIVE');
+    }
+  }
+  setRings(list,cb,stayAt){
+    this.gRing.innerHTML='';if(!list)return;
+    for(const s of list){const P=SP[s];const g=el('g',{class:'ring',tabindex:0,role:'button','aria-label':SPOT_NAME[s]},this.gRing);
+      el('circle',{cx:P[0],cy:P[1],r:2.35},g);
+      const lab=el('text',{class:'ringlab',x:P[0],y:P[1]+3.35,'text-anchor':'middle'},g);lab.textContent=s===stayAt?'STAY':RING_LABEL[s];
+      const go=()=>cb(s);g.addEventListener('click',go);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});}
+  }
+  mark(spot,ok){const P=SP[spot];const g=el('g',{},this.gMark);el('circle',{cx:P[0],cy:P[1],r:2.35,fill:'none',stroke:ok?'var(--good)':'var(--bad)','stroke-width':.42},g);
+    const c=el('g',{transform:`translate(${P[0]+1.9},${P[1]-1.9})`},g);el('circle',{r:.8,fill:ok?'var(--good)':'var(--bad)'},c);
+    el('path',{d:ok?'M-.38 0L-.08 .32L.4 -.3':'M-.3 -.3L.3 .3M.3 -.3L-.3 .3',stroke:'#fff','stroke-width':.18,fill:'none','stroke-linecap':'round'},c);}
+  clearMarks(){this.gMark.innerHTML='';}
+  render(dt){
+    const st=this.c.steps[this.si];const bt=st.beats[this.bi];const t=this.t;this.clock+=dt;
+    const pos=clonePos(bt.startPos);const mvT={};
+    for(const tr of bt.tracks)if(tr.type==='move'){pos[tr.p]=at(tr.poly,ease(clamp((t-tr.delay)/tr.dur)));mvT[tr.p]=tr;}
+    let holder=bt.startBall,flight=null,shotT=null;
+    for(const tr of bt.tracks){
+      if(tr.type==='pass'){const tp=t-tr.delay;if(tp>=0&&tp<tr.dur){holder=null;flight={tr,f:tp/tr.dur};}else if(tp>=tr.dur)holder=tr.b;}
+      if(tr.type==='shot'&&t-tr.delay>=.32){holder=null;shotT=tr;}
+    }
+    const ballX=holder!=null&&pos[holder]?pos[holder][0]:flight?lerp(flight.tr.from,flight.tr.to,flight.f)[0]:null;
+    /* offense */
+    for(const p in this.figs){
+      const fig=this.figs[p],P=pos[p];if(!P)continue;let state='ready',face=null,hop=0;
+      const mt=mvT[p],moving=!!(mt&&t>=mt.delay&&t<mt.delay+mt.dur);const hold=bt.hold[p];const has=String(holder)===String(p);
+      if(moving)state=mt.k==='drib'?'drib':'run';
+      else if(mt&&mt.k==='screen'&&t>=mt.delay+mt.dur)state='screen';
+      else if(hold&&hold!=='jumpstop')state=hold;
+      if(!moving&&has&&(state==='ready'||hold==='jumpstop'))state=hold==='jumpstop'?'jumpstop':'triple';
+      if(state==='jumpstop'&&bt.poseNew[p]&&t<.45)hop=Math.sin(Math.PI*t/.45)*.55;
+      for(const tr of bt.tracks){
+        if(tr.type==='pass'&&!moving){const tp=t-tr.delay;
+          if(String(tr.a)===String(p)&&tp>-.3&&tp<.35){state='pass';face=Math.sign(tr.to[0]-P[0])||null;}
+          if(String(tr.b)===String(p)&&tp>-.2&&tp<tr.dur+.15){state='catch';face=Math.sign(tr.from[0]-P[0])||null;}}
+        if(tr.type==='shot'&&String(tr.p)===String(p)){const tp=t-tr.delay;face=Math.abs(25-P[0])>.8?Math.sign(25-P[0]):face;
+          if(tp>=0){state=tp<1?'shoot':'celebrate';hop=tp<.8?Math.sin(Math.PI*tp/.8)*1.1:0;}else state='triple';}
+      }
+      if(face==null&&moving){const a2=at(mt.poly,clamp(ease(clamp((t-mt.delay)/mt.dur))+.03));if(Math.abs(a2[0]-P[0])>.02)face=Math.sign(a2[0]-P[0]);}
+      if(face==null&&!moving){if(has)face=Math.abs(25-P[0])>1?Math.sign(25-P[0]):null;else if(ballX!=null&&Math.abs(ballX-P[0])>.8)face=Math.sign(ballX-P[0]);}
+      if(fig.prev&&!this.snap)fig.ph+=dist(P,fig.prev)*2.3;fig.prev=P.slice();
+      const target=state==='run'||state==='drib'?runPose(fig.ph,state==='drib'):POSES[state];
+      fig.out=fig.update(P,target,face,dt,this.snap,hop);fig.state=state;
+    }
+    /* ball */
+    let B=null,G=null,scale=1,fl=-1;
+    if(flight){const tr=flight.tr,f=ease(flight.f);const pf=this.figs[tr.a];
+      if(!tr._A)tr._A=pf&&pf.out?pf.out.handF.slice():[tr.from[0],tr.from[1]-2.3*SC];
+      const E=[tr.to[0]+Math.sign(tr.from[0]-tr.to[0])*.6*SC,tr.to[1]-2.3*SC];
+      B=lerp(tr._A,E,f);B[1]-=Math.sin(Math.PI*f)*.8;G=lerp(tr.from,tr.to,f);}
+    else if(shotT){const tp=t-shotT.delay,sf=this.figs[shotT.p];
+      if(!shotT._R)shotT._R=sf&&sf.out?sf.out.handF.slice():[shotT.from[0],shotT.from[1]-5*SC];
+      const f=clamp((tp-.32)/(shotT.dur-.32));const p2=lerp(shotT._R,[25,5.3],f);B=[p2[0],p2[1]-Math.sin(Math.PI*f)*5.5];scale=1+Math.sin(Math.PI*f)*.45;G=lerp(shotT.from,[25,5.3],f);
+      if(tp>shotT.dur){B=[25,6.7];G=B;scale=1;fl=tp-shotT.dur;}}
+    else if(holder!=null&&this.figs[holder]&&this.figs[holder].out){const fg=this.figs[holder],o=fg.out;
+      if(fg.state==='drib'){const u=Math.abs(Math.sin(this.clock*8.5));const top=[o.handF[0]+o.f*.2,o.handF[1]+.45];B=[top[0],top[1]+(o.pos[1]-.42-top[1])*u];G=[top[0],o.pos[1]];}
+      else if(fg.state==='jumpstop'||fg.state==='catch'){B=lerp(o.handF,o.handB,.5);B[0]+=o.f*.3;G=[B[0],o.pos[1]];}
+      else if(fg.state==='shoot'){B=[o.handF[0],o.handF[1]-.3];G=[B[0],o.pos[1]];}
+      else{B=[o.handF[0]+o.f*.38,o.handF[1]];G=[B[0],o.pos[1]];}}
+    else if(bt.startBallAt){B=bt.startBallAt;G=B;}
+    if(B){this.ball.setAttribute('transform',`translate(${f2(B[0])},${f2(B[1])}) scale(${f2(scale)})`);this.ball.style.display='';
+      this.bshadow.setAttribute('cx',f2(G[0]));this.bshadow.setAttribute('cy',f2(G[1]));this.bshadow.style.display='';}
+    else{this.ball.style.display='none';this.bshadow.style.display='none';}
+    if(fl>=0&&fl<.55){this.flash.setAttribute('r',f2(.8+fl*7));this.flash.setAttribute('opacity',f2(1-fl/.55));}else this.flash.setAttribute('opacity',0);
+    /* defense */
+    if(this.c.defOn){const bp=B?[B[0],G[1]]:BASKET;
+      for(const p in this.dfigs){const P=pos[p];const m=bt.dm[p];let T;
+        if(m&&typeof m==='object')T=m.at;else{const toB=unit(P,BASKET);if(m==='off')T=add(P,toB,5.2);else if(m==='deny'){T=add(add(P,unit(P,bp),1.9),toB,.9);}else T=add(P,toB,2.6);}
+        const cur=this.dpos[p];if(!cur||this.snap)this.dpos[p]=T.slice();else{const k=Math.min(1,dt*5.5);this.dpos[p]=lerp(cur,T,k);}
+        const Dp=this.dpos[p],fig=this.dfigs[p];const sp=fig.prev&&dt>0?dist(Dp,fig.prev)/dt:0;
+        if(fig.prev&&!this.snap)fig.ph+=dist(Dp,fig.prev)*3;fig.prev=Dp.slice();
+        const dx=P[0]-Dp[0];const face=Math.abs(dx)>.35?Math.sign(dx):(B&&Math.abs(B[0]-Dp[0])>.6?Math.sign(B[0]-Dp[0]):null);
+        const target=sp>1.2?shufflePose(fig.ph):POSES[m==='deny'?'deny':'def'];
+        fig.out=fig.update(Dp,target,face,dt,this.snap,0);}
+    }
+    /* depth: farther from the camera (smaller y) draws first */
+    const all=[...Object.values(this.dfigs),...Object.values(this.figs)].sort((a,b)=>a.y-b.y);
+    const kids=this.gFig.children;let same=kids.length===all.length;if(same)for(let i=0;i<all.length;i++)if(kids[i]!==all[i].g){same=false;break;}
+    if(!same)for(const fg of all)this.gFig.appendChild(fg.g);
+    this.snap=false;
+    st.beats.forEach((b,i)=>b.tracks.forEach(tr=>{
+      if(!tr.g)return;const fr=i<this.bi?1:i>this.bi?0:clamp((t-tr.delay)/tr.dur);
+      if(tr.type==='move'){tr.prog.setAttribute('stroke-dashoffset',f2(1-ease(fr)));tr.base.setAttribute('opacity',fr>=1?1:(this.preview?.3:0));
+        const y=tr.g.firstChild!==tr.base?tr.g.firstChild:null;if(y)y.setAttribute('opacity',fr>0||this.preview?.8:0);}
+      else tr.g.setAttribute('opacity',fr>0?1:(this.preview?.35:0));
+    }));
+    this.gTag.innerHTML='';
+    st.beats.forEach((b,i)=>{if(i>this.bi)return;for(const tg of b.tags){const P=pos[tg.p];if(!P)continue;const w=tg.l.length*.58+1.2;const g=el('g',{class:'tagg'},this.gTag);
+      el('rect',{x:P[0]-w/2,y:P[1]-7.5,width:w,height:1.6,rx:.4,fill:'var(--you)'},g);const tx=el('text',{x:P[0],y:P[1]-6.67,'text-anchor':'middle','dominant-baseline':'central','font-size':1.05,fill:'#14213d'},g);tx.textContent=tg.l.toUpperCase();}});
+  }
+}
+
+/* ---------- play library ---------- */
+const mv=(p,v,k='cut',l='',o={})=>({m:p,v,k,l,...o});
+const ps=(a,b,o={})=>({pass:[a,b],...o});
+const sh=p=>({shot:p});
+const df=(p,mode,at)=>({d:p,mode,at});
+const tg=(p,l)=>({tag:p,l});
+const wt=s=>({wait:s});
+const po=(p,name)=>({pose:p,name});
+const STD={1:'SL',2:'SR',3:'WL',4:'WR',5:'BR'};
+const ON={1:'on',2:'on',3:'on',4:'on',5:'on'};
+
+const LESSONS=[
+ {name:'Spots',title:'The spots',start:{pos:STD,ball:1},steps:[
+  {x:'Four players stand outside the 3-point line: two in the SLOTS (top of the key, just outside the lane lines) and two on the WINGS (even with the free-throw line). That\'s the "4 out."',ov:'spots'},
+  {x:'The "1 in" is the POST. The post stands on the block on the far side from the ball. Ball is on the left, so 5 is on the right block.',a:[tg(5,'Post')],ov:'spots'},
+  {x:'Stay 12 to 15 feet apart. That\'s about four or five big steps. If you can reach out and touch a teammate, you\'re too close.',ov:'spacing'},
+  {x:'Why spread out? It opens driving lanes to the rim, and one defender can\'t guard two of you at once.',ov:'lanes'}]},
+ {name:'Wing pass',title:'Wing pass: pass, cut, fill',start:{pos:STD,ball:1},steps:[
+  {x:'1 passes from the slot to the wing.',a:[ps(1,3)]},
+  {x:'After you pass, you cut. 1 takes a step away from the ball, then cuts in front of the defender straight to the rim. Always expect the ball on a cut.',a:[mv(1,[[20.2,28.6],'RIM'],'cut','Face cut: step away, then cut in front of your defender to the rim',{s:1})]},
+  {x:'No pass? Everybody FILLS. 2 slides over to 1\'s old slot, 4 lifts up to the empty slot, and 1 circles out to the empty wing.',a:[mv(2,['SL'],'fill','Slide over to the open slot'),mv(4,['SR'],'fill','Lift up to the open slot'),mv(1,[[29.6,10.6],[37,13.8],'WR'],'fill','Circle out and fill the empty wing',{delay:.2})]},
+  {x:'Look: four out, one in again. Same shape, new faces. The offense is ready to go again.',ov:'spots'}]},
+ {name:'Slot to slot',title:'Slot to slot',start:{pos:STD,ball:1},steps:[
+  {x:'1 passes across the top to the other slot.',a:[ps(1,2)]},
+  {x:'1 face cuts to the rim. The ball just switched sides, so the post switches blocks too. The post always stays opposite the ball.',a:[mv(1,[[14.8,27.8],'RIM'],'cut','Face cut to the rim',{s:1}),mv(5,[[25,9.8],'BL'],'cut','Ball switched sides, so switch blocks')]},
+  {x:'No pass? 3 lifts up to the empty slot and 1 fills the wing on that side.',a:[mv(3,['SL'],'fill','Lift up to the open slot'),mv(1,[[21.6,11.4],[13,14.6],'WL'],'fill','Fill the empty wing',{delay:.2})]}]},
+ {name:'Wing to slot',title:'Wing to slot',start:{pos:STD,ball:3},steps:[
+  {x:'3 passes from the wing back up to the slot.',a:[ps(3,1)]},
+  {x:'Pass and cut. 3 face cuts to the rim looking for the ball.',a:[mv(3,[[5.4,21.2],'RIM'],'cut','Face cut to the rim',{s:1})]},
+  {x:'No pass? 3 circles right back out to the same wing. Nobody else has to move.',a:[mv(3,[[20.6,10.6],[12.6,14],'WL'],'fill','Circle back out to your wing')]}]},
+ {name:'Back cut',title:'Denied? Back cut',start:{pos:STD,ball:1,def:{...ON,3:'deny'}},steps:[
+  {x:'Watch 3\'s defender (red #3). He\'s standing in the passing lane so 1 can\'t pass to the wing. That\'s called denying.',a:[mv(3,[[9.6,20.4]],'cut','Take a step toward the ball to sell it'),po(3,'handsup')]},
+  {x:'3 plants and cuts behind the defender to the rim. 1 leads him with the pass.',a:[mv(3,[[8.6,17.4],'RIM'],'cut','Back cut behind your defender',{s:1}),df(3,'at',[11.4,21]),ps(1,3,{lead:1})]},
+  {x:'Layup. Notice the post is on the other side of the floor, so the lane is wide open for the back cut.',a:[sh(3)]}]},
+ {name:'Triple threat',title:'Catch = look to score',start:{pos:STD,ball:1,def:ON},steps:[
+  {x:'3 catches on the wing.',a:[ps(1,3)]},
+  {x:'Every time you catch: pivot, face the rim, and check in this order. 1 SHOOT if you\'re open. 2 PASS if a teammate is open. 3 DRIVE if there\'s a lane.',a:[tg(3,'Face the rim')],ov:'spd'},
+  {x:'Defender backs off? Shoot it (if it\'s a shot you make in practice).',a:[[df(3,'off'),wt(.9)],[sh(3)]]}]},
+ {name:'Drive & dump',title:'Drive and dump off',start:{pos:STD,ball:1,def:ON},steps:[
+  {x:'1 drives to the middle. 5\'s defender leaves 5 to stop the ball. Watch red #5.',a:[mv(1,[[21.4,20.6],[23.6,13.8]],'drib','Attack the middle'),df(5,'at',[25.8,11.4])]},
+  {x:'Jump stop: a quick hop, land on two feet, ball tight to your chest. Now you can pivot either way and pass. 5 shows his hands.',a:[tg(1,'Jump stop'),po(1,'jumpstop'),mv(5,[[30,7]],'cut','Slide open and show your hands'),po(5,'handsup')]},
+  {x:'5 is wide open. Dump it off for an easy two.',a:[[ps(1,5)],[sh(5)]]}]},
+ {name:'Baseline drive',title:'Baseline drive',start:{pos:STD,ball:3,def:ON},steps:[
+  {x:'3 drives the baseline. 5 "T\'s up" (steps up into the paint in front of the rim) and 4 drifts down to the corner.',a:[mv(3,[[5.6,12.2],[9.8,5.4]],'drib','Drive the baseline'),mv(5,[[26.4,10.8]],'cut','T up: step into the paint in front of the rim'),mv(4,['CR'],'fill','Drift to the corner'),df(5,'at',[20.4,6.6]),df(4,'at',[36.5,10.5])]},
+  {x:'5\'s defender stepped over to stop 3, so 5 is open in front of the rim. If they cover 5, kick it to 4 in the corner for three.',a:[[ps(3,5)],[sh(5)]]}]},
+ {name:'Screen away',title:'Screen away',start:{pos:STD,ball:1,def:ON},steps:[
+  {x:'1 passes to the wing.',a:[ps(1,3)]},
+  {x:'Instead of cutting, 1 goes to screen for 2. Screen the defender, not empty space. Find him and put your body on him.',a:[mv(1,[[29.4,25.1]],'screen','Screen 2\'s defender, not space')]},
+  {x:'2 comes off tight, shoulder to shoulder, so his defender can\'t squeeze through, and curls to the rim.',a:[mv(2,[[30.6,28],[27.4,25.6],[25.4,17],'RIM'],'cut','Come off tight, shoulder to shoulder, curl to the rim'),df(2,'at',[31.4,24.6])]},
+  {x:'No pass? 2 fills the wing, 4 lifts to the slot, and 1 pops back to his slot.',a:[mv(4,['SR'],'fill','Lift up to the slot'),mv(1,['SL'],'fill','Pop back to your slot'),mv(2,[[29.8,10.8],[37,14],'WR'],'fill','Fill the wing',{delay:.2}),df(2,'on')]}]},
+ {name:'Ball screen',title:'Empty-side ball screen',start:{pos:STD,ball:3,def:ON},steps:[
+  {x:'1 face cuts and clears out to the far corner. Now the left side is empty except for 3.',a:[mv(1,[[19.8,23],'RIM',[33,10.5],[40.6,6.4],'CR'],'cut','Cut through and clear to the corner')]},
+  {x:'5 sprints up and screens 3\'s defender.',a:[mv(5,[[21.6,10.6],[11.6,18.6]],'screen','Sprint up and screen 3\'s defender')]},
+  {x:'3 dribbles off the screen to the middle. 5 rolls to the rim. 5\'s defender has to jump out at 3.',a:[mv(3,[[9.2,21.4],[14.6,21.4],[19.4,15.6]],'drib','Use the screen and attack the middle'),mv(5,[[14,14],[21.6,9]],'cut','Roll to the rim'),df(3,'at',[10.4,16.8]),df(5,'at',[16.8,18.4])]},
+  {x:'5 is open rolling to the rim. Pass, layup. Nobody on the empty side can help.',a:[[ps(3,5)],[sh(5)]]}]},
+ {name:'Post moves',title:'Post moves',start:{pos:STD,ball:3},steps:[
+  {x:'The post can flash to the ball-side block to get a catch.',a:[mv(5,[[25,10],'BL'],'cut','Flash to the ball side')]},
+  {x:'Count two seconds. No pass? Get out and go back to the far block so the lane stays open.',a:[[tg(5,'1… 2…'),po(5,'handsup'),wt(1.6)],[mv(5,[[25,9.8],'BR'],'cut','No catch in 2 seconds? Get out')]]},
+  {x:'Or flash to the high post (the free-throw line) and catch it there.',a:[[mv(5,[[29.4,13.4],'HP'],'cut','Flash to the high post')],[ps(3,5)]]},
+  {x:'From the high post, look for cutters. 3 passed and cut, so 5 hits him. Layup.',a:[[mv(3,[[5.4,21.2],'RIM'],'cut','Pass and cut',{s:1}),ps(5,3,{lead:1})],[sh(3)]]}]},
+];
+
+/* ---------- "where do I go" quiz generator ---------- */
+const opp=s=>s==='L'?'R':'L';
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function fillFromRim(dest){const sg=SP[dest][0]<25?-1:1;return[[25+sg*4.6,10.6],[25+sg*12,13.9],dest];}
+function genQuiz(role){
+  let tries=0,q;
+  do{q=makeQuiz(role);tries++;}while(tries<4&&q.answer==='stay'&&Math.random()<.6);
+  return q;
+}
+function makeQuiz(role){
+  const type=role==='post'?(Math.random()<.65?'slot':rnd(['wing','back'])):rnd(['wing','wing','slot','slot','back']);
+  const s=rnd(['L','R']),o=opp(s);
+  const nums=shuffle([1,2,3,4,5]);
+  const spotOf={};const who={};
+  [['SL',nums[0]],['SR',nums[1]],['WL',nums[2]],['WR',nums[3]],['B'+o,nums[4]]].forEach(([sp,n])=>{spotOf[n]=sp;who[sp]=n;});
+  const post=nums[4];
+  let passer,recv,final={...spotOf},why={},label;
+  for(const n of nums)why[n]='Nothing changed for you. Hold your spot, stay wide, and be ready to catch.';
+  why[post]='The ball stayed on the same side of the floor, so you stay on the far block. Keep the lane open.';
+  const steps=[];
+  if(type==='wing'){
+    label='Slot to wing';passer=who['S'+s];recv=who['W'+s];
+    const so=who['S'+o],wo=who['W'+o];
+    final[passer]='W'+o;final[so]='S'+s;final[wo]='S'+o;
+    why[passer]='You passed, so you cut! Face cut to the rim. No pass? Fill the empty wing on the other side.';
+    why[so]='Slide over to the slot your teammate just left, so the wing always has a pass back up top.';
+    why[wo]='Lift up to the empty slot.';
+    why[recv]='You have the ball. Catch, face the rim, and look to score: shoot, pass, drive.';
+    steps.push({a:[ps(passer,recv)]});
+    steps.push({a:[mv(passer,[add(SP['S'+s],unit(SP['W'+s],SP['S'+s]),2.3),'RIM'],'cut','Face cut to the rim',{s:1})]});
+    steps.push({a:[mv(so,['S'+s],'fill','Slide over'),mv(wo,['S'+o],'fill','Lift to the slot'),mv(passer,fillFromRim('W'+o),'fill','Fill the empty wing',{delay:.2})]});
+  }else if(type==='slot'){
+    label='Slot to slot';passer=who['S'+s];recv=who['S'+o];
+    const ws=who['W'+s];
+    final[passer]='W'+s;final[ws]='S'+s;final[post]='B'+s;
+    why[passer]='You passed, so you cut! Face cut to the rim. No pass? Fill the wing on your side. It\'s empty now.';
+    why[ws]='Lift up to the slot your teammate cut from.';
+    why[post]='The ball switched sides, so you switch blocks. Always stay opposite the ball.';
+    why[recv]='You have the ball. Catch, face the rim, and look to score.';
+    steps.push({a:[ps(passer,recv)]});
+    steps.push({a:[mv(passer,[add(SP['S'+s],unit(SP['S'+o],SP['S'+s]),2.3),'RIM'],'cut','Face cut to the rim',{s:1}),mv(post,[[25,9.8],'B'+s],'cut','Switch blocks')]});
+    steps.push({a:[mv(ws,['S'+s],'fill','Lift to the slot'),mv(passer,fillFromRim('W'+s),'fill','Fill the wing',{delay:.2})]});
+  }else{
+    label='Wing to slot';passer=who['W'+s];recv=who['S'+s];
+    why[passer]='Pass and cut! Face cut to the rim. No pass? Circle right back out to your same wing.';
+    why[recv]='You have the ball. Catch, face the rim, and look to score.';
+    steps.push({a:[ps(passer,recv)]});
+    steps.push({a:[mv(passer,[add(SP['W'+s],unit(SP['S'+s],SP['W'+s]),2.3),'RIM'],'cut','Face cut to the rim',{s:1})]});
+    steps.push({a:[mv(passer,fillFromRim('W'+s),'fill','Circle back out')]});
+  }
+  let pool=nums;
+  if(role==='slot')pool=nums.filter(n=>spotOf[n][0]==='S');
+  if(role==='wing')pool=nums.filter(n=>spotOf[n][0]==='W');
+  if(role==='post')pool=[post];
+  const you=rnd(pool);
+  const cutter=you===passer;
+  return{type,label,passer,recv,you,cutter,start:spotOf[you],final:final[you],answer:final[you]===spotOf[you]&&!cutter?'stay':final[you],why:why[you],
+    text:`#${passer} passes from the ${SPOT_NAME[spotOf[passer]]} to #${recv} on the ${SPOT_NAME[spotOf[recv]]}. You're #${you} on the ${SPOT_NAME[spotOf[you]]}.`,
+    prog:{start:{pos:spotOf,ball:passer},steps}};
+}
+
+/* ---------- "read the D" scenarios ---------- */
+const READS=[
+ {title:'Denied on the wing',you:3,text:'You\'re #3 on the left wing. Your defender is standing in the passing lane, so 1 can\'t pass to you.',
+  choices:['Wave your arms and keep asking for it','Back cut to the rim','Run out to the corner'],right:1,
+  why:'He\'s overplaying the pass, so the space behind him is open. Plant and back cut. 1 leads you to the rim.',
+  prog:{start:{pos:STD,ball:1,def:{...ON,3:'deny'},hold:{3:'handsup'}},steps:[{a:[mv(3,[[8.6,17.4],'RIM'],'cut','Back cut',{s:1}),df(3,'at',[11,20.8]),ps(1,3,{lead:1})]},{a:[sh(3)]}]},pre:0},
+ {title:'Tight defender',you:4,text:'You\'re #4 on the right wing and need to get open for a pass from 2. Your defender is right up on you, about one step away.',
+  choices:['V cut','Blast (straight) cut','Back cut'],right:0,
+  why:'He\'s close, so you need to make space. Walk him toward the basket, then plant and explode back out. That\'s a V cut.',
+  prog:{start:{pos:{...STD,4:[41,16.5]},ball:2,def:{...ON,4:'deny'}},steps:[{a:[mv(4,[[37.4,12.4],'WR'],'vcut','V cut: in, then explode out',{s:1}),df(4,'at',[38.6,13.2])]},{a:[ps(2,4)]}]},pre:0},
+ {title:'Defender sagging off',you:4,text:'You\'re #4. 1 just cut, so you need to fill the empty right slot. Your defender is sagging two big steps off you.',
+  choices:['V cut','Blast (straight) cut','Back cut'],right:1,
+  why:'He\'s giving you room, so don\'t waste time. Sprint straight to the spot and catch. That\'s a blast cut.',
+  prog:{start:{pos:{1:[25,8.6],2:'SL',3:'WL',4:'WR',5:'BR'},ball:2,def:{...ON,4:'off'}},steps:[{a:[mv(4,['SR'],'blast','Blast cut straight to the slot')]},{a:[ps(2,4)]}]},pre:0},
+ {title:'Open on the catch',you:3,text:'You\'re #3. You just caught it on the wing and your defender is three big steps back.',
+  choices:['Shoot it (if it\'s your shot)','Pass it right back','Hold it and look around'],right:0,
+  why:'Catch means look to score. First check: am I open? You are. Shoot it.',
+  prog:{start:{pos:STD,ball:1,def:{...ON,3:'off'}},steps:[{a:[ps(1,3)]},{a:[sh(3)]}]},pre:1},
+ {title:'Help comes on the drive',you:1,text:'You\'re #1. You drove the middle and 5\'s defender stepped up to stop you.',
+  choices:['Force up a layup over him','Jump stop and dump it to 5','Dribble back out to the slot'],right:1,
+  why:'When the post defender helps, the post is open. Jump stop on two feet and dump it off.',
+  prog:{start:{pos:STD,ball:1,def:ON},steps:[{a:[mv(1,[[21.4,20.6],[23.6,13.8]],'drib','Drive middle'),df(5,'at',[25.8,11.4])]},{a:[[tg(1,'Jump stop'),po(1,'jumpstop'),mv(5,[[30,7]],'cut',''),po(5,'handsup')],[ps(1,5)],[sh(5)]]}]},pre:1},
+ {title:'Ball switched sides',you:5,text:'You\'re #5 on the right block. The ball just went slot to slot, from the left side to the right side.',
+  choices:['Stay on the right block','Switch to the left block','Flash to the high post'],right:1,
+  why:'The post lives opposite the ball. Ball went right, so you go left.',
+  prog:{start:{pos:STD,ball:1},steps:[{a:[ps(1,2)]},{a:[mv(5,[[25,9.8],'BL'],'cut','Switch blocks'),mv(1,[[14.8,27.8],'RIM'],'cut','',{s:1})]},{a:[mv(3,['SL'],'fill'),mv(1,[[21.6,11.4],[13,14.6],'WL'],'fill','',{delay:.2})]}]},pre:1},
+ {title:'Baseline drive',you:5,text:'You\'re #5 on the right block. 3 is driving the baseline from the left wing.',
+  choices:['Stay on the block','T up: step into the paint in front of the rim','Pop out to the 3-point line'],right:1,
+  why:'Your defender will step over to stop 3. T up into the middle in front of the rim and you\'re the open man.',
+  prog:{start:{pos:STD,ball:3,def:ON},steps:[{a:[mv(3,[[5.6,12.2],[9.8,5.4]],'drib','Drive the baseline'),mv(5,[[26.4,10.8]],'cut','T up'),mv(4,['CR'],'fill','Drift to the corner'),df(5,'at',[20.4,6.6]),df(4,'at',[36.5,10.5])]},{a:[[ps(3,5)],[sh(5)]]}]},pre:0},
+ {title:'Screener\'s defender stays high',you:1,text:'You\'re #1 setting an away screen for 2. Your defender is sitting up high to stop 2 from curling.',
+  choices:['Hold the screen and wait','Slip: dive straight to the rim','Pop back out to the slot'],right:1,
+  why:'Your defender isn\'t between you and the basket anymore. The lane is yours. Slip to the rim.',
+  prog:{start:{pos:{...STD,1:[29.4,25.1]},ball:3,def:{...ON,1:'at'}},steps:[{a:[df(1,'at',[27.8,28.3]),wt(.5)]},{a:[mv(1,[[27,16],'RIM'],'cut','Slip to the rim'),ps(3,1,{lead:1})]},{a:[sh(1)]}]},pre:1},
+ {title:'Post flash, no pass',you:5,text:'You\'re #5. You flashed to the ball-side block, counted two seconds, and no pass came.',
+  choices:['Stay and keep calling for it','Get out, back to the far block','Go set a screen on the ball'],right:1,
+  why:'Two seconds and out. If you stay, you clog the lane for drives and cuts.',
+  prog:{start:{pos:STD,ball:3},steps:[{a:[[mv(5,[[25,10],'BL'],'cut','Flash')],[tg(5,'1… 2…'),po(5,'handsup'),wt(1.4)]]},{a:[mv(5,[[25,9.8],'BR'],'cut','Get out')]}]},pre:1},
+];
+READS[7].prog.start.def={...ON};
+
+/* ---------- rules ---------- */
+const RULES=[
+ ['Four out, one in.','Two slots, two wings, one post.',0],
+ ['Stay 12 to 15 feet apart.','About four or five big steps. Spacing makes the driving lanes.',0],
+ ['The post lives opposite the ball.','Ball switches sides, you switch blocks.',2],
+ ['Pass and cut.','After you pass, face cut to the rim and expect the ball back.',1],
+ ['Fill the empty spot.','No pass? Everyone moves up a spot toward the ball. The cutter fills the last open spot.',1],
+ ['Catch means look to score.','Shoot, pass, drive. In that order.',5],
+ ['Denied? Back cut.','If your defender is in the passing lane, go behind him to the rim.',4],
+ ['Stopped? Jump stop.','Land on two feet and find the open man. The post is your first look.',6],
+ ['Screen the defender, not space.','Cutters come off shoulder to shoulder so nobody can squeeze through.',8],
+ ['Post: two seconds, then get out.','Flash ball side for a catch. No pass, go back to the far block.',10],
+];
+
+/* ---------- UI ---------- */
+const $=s=>document.querySelector(s);
+const court=new Court($('#court'));
+let tab='learn',lesson=0,followP=null;
+
+// learn
+const chips=$('#lessonChips');
+LESSONS.forEach((L,i)=>{const b=document.createElement('button');b.className='chip';b.innerHTML=`<span class="n">${i+1}</span>${L.name}`;b.setAttribute('aria-pressed','false');b.onclick=()=>loadLesson(i);chips.appendChild(b);});
+const fs=$('#followSeg');
+[1,2,3,4,5,null].forEach(p=>{const b=document.createElement('button');b.textContent=p==null?'Off':p;b.setAttribute('aria-pressed',String(p===followP));b.setAttribute('aria-label',p==null?'Follow nobody':'Follow player '+p);
+  b.onclick=()=>{followP=p;[...fs.children].forEach(c=>c.setAttribute('aria-pressed',String(c===b)));court.setFollow(p);updateLearn(court.si);store.set('f41-follow',p);};fs.appendChild(b);});
+followP=store.get('f41-follow',null);[...fs.children].forEach((c,i)=>c.setAttribute('aria-pressed',String([1,2,3,4,5,null][i]===followP)));
+const spd=$('#speedSeg');
+spd.querySelectorAll('button').forEach(b=>b.onclick=()=>{court.speed=+b.dataset.speed;spd.querySelectorAll('button').forEach(c=>c.setAttribute('aria-pressed',String(c===b)));store.set('f41-speed',court.speed);});
+court.speed=store.get('f41-speed',1);spd.querySelectorAll('button').forEach(c=>c.setAttribute('aria-pressed',String(+c.dataset.speed===court.speed)));
+
+function jobFor(step,p){
+  const out=[];
+  for(const b of step.beats){for(const tg of b.tags)if(String(tg.p)===String(p))out.push(tg.l.replace(/…/g,'').trim()==='1 2'?'Count two seconds':tg.l);
+    for(const t of b.tracks){
+      if(t.type==='move'&&String(t.p)===String(p))out.push(t.l||KIND_JOB[t.k]);
+      if(t.type==='pass'&&String(t.a)===String(p))out.push('Pass to #'+t.b);
+      if(t.type==='pass'&&String(t.b)===String(p))out.push('Catch it and look to score');
+      if(t.type==='shot'&&String(t.p)===String(p))out.push('Score it');}}
+  if(!out.length)return String(p)==='5'?'Stay on your block, opposite the ball. Keep the lane open.':'Hold your spot, stay wide, and be ready to catch.';
+  return out.join(' → ');
+}
+function updateLearn(i){
+  if(tab!=='learn')return;const L=LESSONS[lesson],st=court.c.steps[i];
+  $('#lsEyebrow').textContent=`Lesson ${lesson+1} · Step ${i+1} of ${court.c.steps.length}`;
+  $('#lsTitle').textContent=L.title;$('#lsText').textContent=st.x;
+  const job=$('#lsJob');if(followP!=null){job.hidden=false;job.innerHTML=`<b>Your job as #${followP}:</b> ${jobFor(st,followP)}`;}else job.hidden=true;
+  const d=$('#lsDots');d.innerHTML='';court.c.steps.forEach((_,k)=>{const x=document.createElement('i');if(k<=i)x.className='on';d.appendChild(x);});
+  $('#bPrev').disabled=i===0;$('#bNext').disabled=i===court.c.steps.length-1;
+  const hasAnim=st.beats.some(b=>b.tracks.length||b.tags.length);$('#bPlay').disabled=!hasAnim;
+  setPlayLabel(court.playing);
+}
+function setPlayLabel(on){const b=$('#bPlay');if(on)b.textContent='❚❚ Pause';else b.textContent=court.c&&court.atEnd()&&tab==='learn'?'↺ Replay':'▶ Play step';}
+function loadLesson(i){lesson=i;store.set('f41-lesson',i);[...chips.children].forEach((c,k)=>c.setAttribute('aria-pressed',String(k===i)));court.setFollow(followP);court.load(LESSONS[i]);
+  const c=chips.children[i];if(c&&chips.scrollWidth>chips.clientWidth)chips.scrollTo({left:c.offsetLeft-16,behavior:'smooth'});}
+court.onStep=i=>{if(tab==='learn')updateLearn(i);};
+court.onPlay=on=>{if(tab==='learn')setPlayLabel(on);};
+$('#bPlay').onclick=()=>{if(court.playing)court.pause();else if(court.atEnd()||(court.bi===0&&court.t===0))court.play(null);else court.resume();};
+$('#bNext').onclick=()=>{if(court.si<court.c.steps.length-1)court.play(court.si+1);};
+$('#bPrev').onclick=()=>{if(court.si>0)court.play(court.si-1);};
+$('#bAll').onclick=()=>court.play(0,{all:true});
+document.addEventListener('keydown',e=>{if(tab!=='learn'||e.target.closest('input,textarea'))return;
+  if(e.key==='ArrowRight'){e.preventDefault();$('#bNext').click();}else if(e.key==='ArrowLeft'){e.preventDefault();$('#bPrev').click();}
+  else if(e.key===' '&&!e.target.closest('button')){e.preventDefault();$('#bPlay').click();}});
+
+// quiz
+let Q=null,qRole=store.get('f41-role','any');const qs=store.get('f41-quiz',{right:0,best:0});let streak=0;
+const RINGS=['SL','SR','WL','WR','BL','BR','RIM','CL','CR','HP'];
+function qScore(){$('#qRight').textContent=qs.right;$('#qStreak').textContent=streak;$('#qBest').textContent=qs.best;}
+const rs=$('#roleSeg');rs.querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.role===qRole));b.onclick=()=>{qRole=b.dataset.role;store.set('f41-role',qRole);rs.querySelectorAll('button').forEach(c=>c.setAttribute('aria-pressed',String(c===b)));newQuestion();};});
+function fb(box,ok,head,body){box.hidden=false;box.className='fb '+(ok?'ok':'no');box.innerHTML=`<b>${head}</b>${body}`;}
+function newQuestion(){
+  Q=genQuiz(qRole);Q.stage=Q.cutter?'cut':'fill';Q.clean=true;
+  $('#qType').textContent=Q.label;$('#qText').textContent=Q.text;$('#qAsk').textContent='Watch the pass…';$('#qFb').hidden=true;$('#qHint').hidden=true;$('#qNext').disabled=true;
+  court.setFollow(Q.you);court.load(Q.prog,{preview:false});court.play(0,{done:ask});
+}
+function ask(){
+  if(tab!=='quiz'||!Q)return;
+  $('#qAsk').textContent=Q.stage==='cut'?'You\'re up. What do you do?':(Q.cutter?'No pass came. Where do you fill?':'Where do you go?');
+  $('#qHint').hidden=false;
+  const here=Q.stage==='fill'&&Q.cutter?'RIM':Q.start;
+  court.setRings(RINGS,answer,here);
+}
+function answer(spot){
+  court.setRings(null);$('#qHint').hidden=true;
+  const here=Q.stage==='fill'&&Q.cutter?'RIM':Q.start;
+  const correct=Q.stage==='cut'?'RIM':Q.final;const ok=spot===correct;
+  court.mark(spot,ok);if(!ok)court.mark(correct,true);
+  if(!ok)Q.clean=false;
+  if(Q.stage==='cut'){
+    if(ok){fb($('#qFb'),true,'Yes, pass and cut!','Cut hard to the rim and expect the ball back.');$('#qAsk').textContent='Cutting…';
+      court.play(1,{done:()=>{court.clearMarks();Q.stage='fill';ask();}});return;}
+    fb($('#qFb'),false,'Not quite',Q.why);finish();court.play(1,{until:2});return;
+  }
+  const stayed=correct===here;
+  fb($('#qFb'),ok,ok?(stayed?'Right, you stay!':'Nailed it!'):'Not quite',Q.why);finish();
+  court.play(Q.cutter?2:1,{until:2});
+}
+function finish(){
+  if(Q.clean){qs.right++;streak++;qs.best=Math.max(qs.best,streak);}else streak=0;
+  store.set('f41-quiz',qs);qScore();$('#qAsk').textContent=Q.clean?'Run it again with the next play.':'Watch how it should go.';$('#qNext').disabled=false;
+}
+$('#qNext').onclick=newQuestion;
+$('#qReplay').onclick=()=>{if(!Q)return;court.clearMarks();court.setRings(null);court.play(0,{until:court.c.steps.length-1,done:()=>{}});};
+
+// reads
+let rIdx=store.get('f41-read',0)%READS.length;
+function loadRead(i){
+  rIdx=(i+READS.length)%READS.length;store.set('f41-read',rIdx);const r=READS[rIdx];
+  $('#rCount').textContent=`Read ${rIdx+1} of ${READS.length}`;$('#rTitle').textContent=r.title;$('#rText').textContent=r.text;$('#rFb').hidden=true;$('#rNext').disabled=false;
+  const box=$('#rChoices');box.innerHTML='';
+  const btns=r.choices.map((c,k)=>{const b=document.createElement('button');b.className='choice';b.textContent=c;b.disabled=r.pre>0;b.onclick=()=>pick(k);box.appendChild(b);return b;});
+  court.setFollow(r.you);court.load(r.prog,{preview:false});
+  if(r.pre>0)court.play(0,{until:r.pre-1,done:()=>btns.forEach(b=>b.disabled=false)});
+  function pick(k){btns.forEach((b,j)=>{b.disabled=true;if(j===r.right)b.classList.add('right');else if(j===k)b.classList.add('wrong');});
+    fb($('#rFb'),k===r.right,k===r.right?'Good read!':'Not this time',r.why);court.play(r.pre,{until:court.c.steps.length-1});}
+}
+$('#rNext').onclick=()=>loadRead(rIdx+1);
+$('#rReplay').onclick=()=>court.play(0,{until:court.c.steps.length-1});
+
+// rules
+const rl=$('#rulesList');
+RULES.forEach(([h,p,li])=>{const x=document.createElement('li');x.innerHTML=`<div><b>${h}</b><p>${p}</p></div>`;const b=document.createElement('button');b.className='btn';b.textContent='Show me';b.onclick=()=>{setTab('learn');loadLesson(li);court.play(0,{all:true});};x.appendChild(b);rl.appendChild(x);});
+
+// tabs
+function setTab(t,init){
+  tab=t;document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===t)));
+  for(const k of['learn','quiz','reads','rules'])$('#p-'+k).hidden=k!==t;
+  court.stop();court.setRings(null);court.clearMarks();
+  if(t==='learn'){court.setFollow(followP);loadLesson(lesson);}
+  if(t==='quiz'){qScore();newQuestion();}
+  if(t==='reads')loadRead(rIdx);
+  if(t==='rules'){court.setFollow(null);court.load({start:{pos:STD,ball:1},steps:[{ov:'spots'}]});}
+  if(!init)try{history.replaceState(null,'','#'+t);}catch(e){}
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+lesson=Math.min(store.get('f41-lesson',0),LESSONS.length-1);
+const h=(location.hash||'').slice(1);
+setTab(['learn','quiz','reads','rules'].includes(h)?h:'learn',true);
+})();
+</script>
+
+</body>
+</html>
